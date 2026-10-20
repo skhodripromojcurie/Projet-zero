@@ -14,7 +14,8 @@ Sous Windows : glisser Adam_Morel.glb sur tools/blender/preparer_adam.bat.
   5-ambiance/     mêmes rendus sous la lumière du plan A01
 
 Durée indicative sur un ordinateur portable : 10 à 30 minutes (rendus Cycles).
-PZ_RENDU_RAPIDE=1 pour des rendus d'aperçu, PZ_RENDU_FIN=1 pour la pleine résolution.
+PZ_RENDU_RAPIDE=1 pour des rendus d'aperçu, PZ_RENDU_FIN=1 pour la pleine résolution,
+PZ_SANS_RENDU=1 pour ne produire que le GLB et les rapports (vérification automatique).
 """
 
 import os

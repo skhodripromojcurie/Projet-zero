@@ -52,6 +52,11 @@ def rapport(chemin):
         # Les orteils pointent vers l'avant du personnage.
         avant = commun.position_os(armature, pied, "tail") - commun.position_os(armature, pied, "head")
         orientation = "-Y (correct pour l'export glTF)" if avant.y < 0 else "+Y (à pivoter de 180°)"
+    classes = commun.classer_maillages(armature) if armature else {}
+    composition = {
+        cle: ([o.name for o in valeur] if isinstance(valeur, list) else (valeur.name if valeur else None))
+        for cle, valeur in classes.items()
+    }
     manquants = [a for a, b in correspondance.items() if b is None]
     alertes = []
     hauteur = maxi.z - mini.z
@@ -76,6 +81,7 @@ def rapport(chemin):
         "os": len(armature.data.bones) if armature else 0,
         "noms_os": [b.name for b in armature.data.bones] if armature else [],
         "correspondance_studio": correspondance,
+        "composition": composition,
         "maillages": [{"nom": o.name, "sommets": len(o.data.vertices), "materiaux": [m.name for m in o.data.materials if m]} for o in maillages],
         "triangles": triangles,
         "textures": textures(),
@@ -93,6 +99,10 @@ def texte(r):
         f"Os : {r['os']} · triangles : {r['triangles']} · animations : {len(r['animations'])}",
         f"Expressions : {len(r['expressions'])} (dont ARKit : {', '.join(r['expressions_arkit']) or 'aucune'})",
         "Textures : " + (", ".join(f"{t['nom']} {t['largeur']}×{t['hauteur']}" for t in r["textures"]) or "aucune"),
+        "Composition : " + " · ".join(
+            f"{cle} : {', '.join(v) if isinstance(v, list) else v}"
+            for cle, v in r.get("composition", {}).items() if v
+        ),
         "Correspondance avec le studio :",
     ]
     lignes += [f"  {a:<10} → {b or 'MANQUANT'}" for a, b in r["correspondance_studio"].items()]
@@ -148,6 +158,8 @@ def evaluer(entree, dossier, ambiance="neutre", rapide=False):
     with open(os.path.join(dossier, "rapport.txt"), "w", encoding="utf-8") as f:
         f.write(texte(r) + "\n")
     print(texte(r))
+    if os.environ.get("PZ_SANS_RENDU") == "1":
+        return r
     rendus(dossier, ambiance, (540, 960) if rapide else (1080, 1920), 16 if rapide else 64)
     print(f"Rendus écrits dans {dossier}")
     return r

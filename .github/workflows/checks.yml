@@ -27,3 +27,25 @@ jobs:
           path: |
             artifacts/
             test-results/
+  blender:
+    # Exécute réellement les scripts tools/blender (Blender en module Python)
+    # sur le mannequin de test, puis vérifie que le studio relit le GLB produit.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: sudo apt-get update && sudo apt-get install -y libxi6 libxkbcommon0 libsm6 libgl1 libegl1
+      - run: pip install bpy==5.0.1
+      - run: python tools/blender/mannequin_test.py -- mannequin.blend mannequin.glb
+      - run: python tools/blender/preparer_adam.py -- mannequin.glb sortie
+        env:
+          PZ_SANS_RENDU: "1"
+          PZ_IMAGES_SIMULATION: "30"
+      - run: node tests/blender-pipeline.mjs sortie/adam_v1.glb

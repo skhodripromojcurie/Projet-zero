@@ -11,6 +11,8 @@ Méthode, sans modélisation manuelle :
 4. capuche rabattue sur le dos et cordons ;
 5. les poids du squelette sont transférés du corps aux vêtements, et la peau
    cachée sous les vêtements est retirée pour éviter qu'elle ne les traverse.
+Les vêtements d'origine éventuels sont retirés (PZ_GARDER_VETEMENTS=1 pour les garder) ;
+cheveux, sourcils, cils, yeux, dents et chaussures sont conservés.
 Réglages (variables d'environnement) : PZ_IMAGES_SIMULATION (80), PZ_EXCEDENT_TISSU
 (0.16 : part de tissu en trop, plus = plus de plis), PZ_RIGIDITE_FLEXION (0.25).
 """
@@ -550,7 +552,13 @@ def habiller(entree, sortie, sortie_glb=None):
     if armature is None:
         raise SystemExit("Aucun squelette trouvé : le personnage doit être riggé.")
     armature.data.pose_position = "REST"
-    corps = commun.corps_principal(armature)
+    classes = commun.classer_maillages(armature)
+    corps = classes["corps"]
+    # Les vêtements d'origine sont remplacés par le sweat et le jean.
+    if classes["vetements"] and os.environ.get("PZ_GARDER_VETEMENTS") != "1":
+        print("Vêtements d'origine retirés : " + ", ".join(o.name for o in classes["vetements"]))
+        for objet in classes["vetements"]:
+            bpy.data.objects.remove(objet, do_unlink=True)
     h = hauteurs(armature)
     dominant = os_dominant(corps)
     monde = [corps.matrix_world @ v.co for v in corps.data.vertices]

@@ -181,7 +181,7 @@ def expressions(entree, sortie, dossier_planche=None):
     maillages, noms = ajouter_expressions(armature)
     print(f"Expressions {', '.join(noms)} ajoutées à : {', '.join(maillages)}")
     bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(sortie))
-    if dossier_planche:
+    if dossier_planche and os.environ.get("PZ_SANS_RENDU") != "1":
         os.makedirs(dossier_planche, exist_ok=True)
         planche(dossier_planche, trouver_yeux(armature))
     return noms

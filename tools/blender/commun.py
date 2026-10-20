@@ -80,12 +80,55 @@ def maillages_rigges(armature):
     ]
 
 
+def etendue_verticale(objet):
+    points = [objet.matrix_world @ Vector(c) for c in objet.bound_box]
+    return max(p.z for p in points) - min(p.z for p in points)
+
+
 def corps_principal(armature):
-    """Le maillage riggé le plus dense est considéré comme le corps."""
+    """Le corps va de la tête aux pieds : on prend le maillage riggé le plus haut,
+    puis le plus dense (un vêtement peut être plus dense que le corps)."""
     candidats = maillages_rigges(armature) if armature else []
     if not candidats:
         candidats = [o for o in bpy.context.scene.objects if o.type == "MESH"]
-    return max(candidats, key=lambda o: len(o.data.vertices)) if candidats else None
+    if not candidats:
+        return None
+    nommes = [o for o in candidats if any(m in o.name.lower() for m in ("body", "human", "corps"))]
+    if nommes:
+        candidats = nommes
+    haut = max(etendue_verticale(o) for o in candidats)
+    return max(
+        (o for o in candidats if etendue_verticale(o) > haut * 0.9),
+        key=lambda o: len(o.data.vertices),
+    )
+
+
+CATEGORIES = {
+    "pilosite": ("hair", "cheveu", "brow", "sourcil", "lash", "cil", "beard", "barbe", "mustache", "moustache"),
+    "yeux": ("eye", "oeil", "œil", "yeux"),
+    "bouche": ("teeth", "tooth", "dent", "tongue", "langue"),
+    "chaussures": ("shoe", "boot", "sneaker", "chaussure", "basket", "sock", "chaussette"),
+}
+
+
+def classer_maillages(armature):
+    """Corps, pilosité, yeux, bouche, chaussures ; le reste est considéré comme vêtement."""
+    corps = corps_principal(armature)
+    classes = {"corps": corps, "vetements": []}
+    for nom in CATEGORIES:
+        classes[nom] = []
+    for objet in maillages_visibles():
+        if objet is corps:
+            continue
+        nom = objet.name.lower()
+        for categorie, mots in CATEGORIES.items():
+            # « eyebrow » et « eyelash » sont de la pilosité, pas des yeux.
+            if any(m in nom for m in mots) and not (categorie == "yeux" and any(m in nom for m in CATEGORIES["pilosite"])):
+                classes[categorie].append(objet)
+                break
+        else:
+            classes["vetements"].append(objet)
+    return classes
 
 
 def trouver_os(armature, articulation, table=MPFB_GAME_ENGINE):
