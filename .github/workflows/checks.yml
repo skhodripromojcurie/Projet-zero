@@ -1,0 +1,29 @@
+name: Vérification du prototype
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  prototype:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run test:e2e
+        env:
+          STUDIO_PREVIEW: "1"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: apercus-et-resultats
+          path: |
+            artifacts/
+            test-results/
