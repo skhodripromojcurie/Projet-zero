@@ -121,6 +121,23 @@ def creer_squelette():
     return armature
 
 
+def creer_yeux():
+    """Deux globes simples, pour éprouver le script d'expressions."""
+    objets = []
+    for x in (0.032, -0.032):
+        bpy.ops.mesh.primitive_uv_sphere_add(radius=0.012, location=(x, -0.088, 1.668), segments=16, ring_count=10)
+        objets.append(bpy.context.active_object)
+    with bpy.context.temp_override(active_object=objets[0], selected_editable_objects=objets, selected_objects=objets):
+        bpy.ops.object.join()
+    yeux = objets[0]
+    yeux.name = "Yeux"
+    mat = bpy.data.materials.new("Œil")
+    mat.use_nodes = True
+    mat.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.8, 0.78, 0.74, 1)
+    yeux.data.materials.append(mat)
+    return yeux
+
+
 def main():
     args = commun.arguments()
     sortie_blend = args[0] if args else "mannequin_test.blend"
@@ -132,10 +149,20 @@ def main():
     armature.select_set(True)
     bpy.context.view_layer.objects.active = armature
     bpy.ops.object.parent_set(type="ARMATURE_AUTO")
+    yeux = creer_yeux()
+    bpy.ops.object.select_all(action="DESELECT")
+    yeux.select_set(True)
+    armature.select_set(True)
+    bpy.context.view_layer.objects.active = armature
+    armature.data.bones.active = armature.data.bones["head"]
+    bpy.ops.object.mode_set(mode="POSE")
+    bpy.ops.object.mode_set(mode="OBJECT")
+    bpy.ops.object.parent_set(type="BONE")
     bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(sortie_blend))
     if len(args) > 1:
         bpy.ops.export_scene.gltf(filepath=os.path.abspath(args[1]), export_format="GLB")
     print(f"Mannequin de test : {len(corps.data.vertices)} sommets, {len(OS)} os.")
 
 
-main()
+if __name__ == "__main__":
+    main()

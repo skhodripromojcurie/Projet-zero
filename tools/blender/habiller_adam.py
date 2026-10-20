@@ -538,11 +538,9 @@ def masquer_peau(corps, vetements, marge=0.012):
     bm.free()
 
 
-def main():
-    args = commun.arguments()
-    if len(args) < 2:
-        raise SystemExit(__doc__)
-    entree, sortie = os.path.abspath(args[0]), os.path.abspath(args[1])
+def habiller(entree, sortie, sortie_glb=None):
+    """Habille le personnage de « entree » et enregistre « sortie » (.blend), et un .glb si demandé."""
+    entree, sortie = os.path.abspath(entree), os.path.abspath(sortie)
     commun.vider_scene()
     if entree.endswith(".blend"):
         bpy.ops.wm.open_mainfile(filepath=entree)
@@ -605,9 +603,28 @@ def main():
     masquer_peau(corps, [sweat, jean])
     armature.data.pose_position = "POSE"
     bpy.ops.wm.save_as_mainfile(filepath=sortie)
-    if len(args) > 2:
-        bpy.ops.export_scene.gltf(filepath=os.path.abspath(args[2]), export_format="GLB")
+    if sortie_glb:
+        exporter_glb(sortie_glb)
     print(f"Vêtements : sweat {len(sweat.data.vertices)} sommets, jean {len(jean.data.vertices)} sommets.")
 
 
-main()
+def exporter_glb(chemin):
+    """Export pour le navigateur : squelette, poids, expressions ; ni caméra ni lumière."""
+    os.makedirs(os.path.dirname(os.path.abspath(chemin)) or ".", exist_ok=True)
+    bpy.ops.export_scene.gltf(
+        filepath=os.path.abspath(chemin),
+        export_format="GLB",
+        export_cameras=False,
+        export_lights=False,
+        export_skins=True,
+        export_morph=True,
+        export_animations=False,
+        export_apply=False,
+    )
+
+
+if __name__ == "__main__":
+    args = commun.arguments()
+    if len(args) < 2:
+        raise SystemExit(__doc__)
+    habiller(args[0], args[1], args[2] if len(args) > 2 else None)

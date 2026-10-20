@@ -125,6 +125,10 @@ def ecrire_json(chemin, donnees):
 
 
 def regler_rendu(resolution=(1080, 1920), echantillons=48):
+    if os.environ.get("PZ_RENDU_FIN") != "1" and resolution[1] > 1280:
+        # Par défaut : aperçu 720 × 1280, deux fois plus rapide.
+        resolution = (resolution[0] * 2 // 3, resolution[1] * 2 // 3)
+        echantillons = min(echantillons, 40)
     scene = bpy.context.scene
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"

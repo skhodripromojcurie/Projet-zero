@@ -134,12 +134,9 @@ def rendus(dossier, ambiance, resolution, echantillons):
     return fichiers
 
 
-def main():
-    args = commun.arguments()
-    if len(args) < 2:
-        raise SystemExit(__doc__)
-    entree, dossier = os.path.abspath(args[0]), os.path.abspath(args[1])
-    ambiance = args[2] if len(args) > 2 else "neutre"
+def evaluer(entree, dossier, ambiance="neutre", rapide=False):
+    """Rapport et rendus d'un fichier .glb ou .blend ; renvoie le rapport."""
+    entree, dossier = os.path.abspath(entree), os.path.abspath(dossier)
     os.makedirs(dossier, exist_ok=True)
     commun.vider_scene()
     if entree.endswith(".blend"):
@@ -151,9 +148,13 @@ def main():
     with open(os.path.join(dossier, "rapport.txt"), "w", encoding="utf-8") as f:
         f.write(texte(r) + "\n")
     print(texte(r))
-    rapide = os.environ.get("PZ_RENDU_RAPIDE") == "1"
     rendus(dossier, ambiance, (540, 960) if rapide else (1080, 1920), 16 if rapide else 64)
     print(f"Rendus écrits dans {dossier}")
+    return r
 
 
-main()
+if __name__ == "__main__":
+    args = commun.arguments()
+    if len(args) < 2:
+        raise SystemExit(__doc__)
+    evaluer(args[0], args[1], args[2] if len(args) > 2 else "neutre", os.environ.get("PZ_RENDU_RAPIDE") == "1")
