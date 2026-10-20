@@ -417,6 +417,13 @@ button:active {
   font-size: 7px;
   margin-left: auto;
 }
+.model-status {
+  margin: 8px 20px 0;
+  color: #9fb0a6;
+  font-size: 9px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
 .library-note {
   margin: 22px 20px;
   color: #7c8983;
@@ -633,28 +640,30 @@ h1 > span {
 .frame-bottom {
   bottom: 4%;
 }
+/* Compact system panel in the lower third: Adam's face stays clear. */
 .rpg {
   position: absolute;
-  left: 7%;
-  right: 7%;
-  top: 29%;
-  border: 1px solid #80deec66;
-  background: linear-gradient(135deg, #0b2534ed, #0b202ce6);
+  left: 6%;
+  width: 60%;
+  bottom: 9%;
+  border: 1px solid #80deec59;
+  background: linear-gradient(135deg, #0b2534c4, #0b202cb0);
+  backdrop-filter: blur(2px);
   box-shadow:
-    0 0 24px #5bcce51f,
-    inset 0 0 20px #52ceec0a;
-  padding: 7%;
+    0 0 22px #5bcce526,
+    inset 0 0 18px #52ceec12;
+  padding: 4.2% 4.8%;
   color: #bceaf0;
   pointer-events: none;
   opacity: 0;
-  font-size: 3cqw;
+  font-size: 2.6cqw;
 }
 .rpg:before,
 .rpg:after {
   content: "";
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-color: #acffff;
   border-style: solid;
   filter: drop-shadow(0 0 3px #63ffff);
@@ -672,32 +681,34 @@ h1 > span {
 .rpg-system {
   display: flex;
   justify-content: space-between;
-  font-size: 1.7cqw;
+  gap: 6px;
+  font-size: 1.5cqw;
   letter-spacing: 0.4px;
   color: #68bacb;
   border-bottom: 1px solid #7dc5d42b;
-  padding-bottom: 8%;
+  padding-bottom: 4%;
 }
 .rpg h2 {
-  font-size: 4.1cqw;
+  font-size: 3.2cqw;
   letter-spacing: 0.4px;
   font-weight: 500;
-  margin: 13% 0 6%;
-  line-height: 1.5;
+  margin: 6% 0 2%;
+  line-height: 1.35;
   overflow-wrap: anywhere;
   color: #bdf4fb;
+  text-shadow: 0 0 8px #5fd2ff66;
 }
 .rpg > p {
-  font-size: 3.1cqw;
-  line-height: 1.6;
+  font-size: 2.5cqw;
+  line-height: 1.45;
   overflow-wrap: anywhere;
   color: #b0d4dc;
 }
 .rpg-person {
   display: flex;
   justify-content: space-between;
-  font-size: 2.3cqw;
-  margin-top: 13%;
+  font-size: 1.9cqw;
+  margin-top: 6%;
   align-items: center;
 }
 .rpg-person strong {
@@ -705,18 +716,18 @@ h1 > span {
   letter-spacing: 0.5px;
 }
 .rpg-person > span {
-  font-size: 2cqw;
+  font-size: 1.7cqw;
   color: #6d9fae;
 }
 .rpg-person b {
-  font-size: 4.5cqw;
+  font-size: 3.4cqw;
   color: #aeeaf6;
   margin-left: 3px;
 }
 .xp-bar {
   height: 2px;
   background: #69c6de24;
-  margin-top: 5%;
+  margin-top: 3%;
 }
 .xp-bar i {
   display: block;
@@ -727,31 +738,31 @@ h1 > span {
 .rpg-xp {
   display: flex;
   justify-content: space-between;
-  font-size: 1.8cqw;
+  font-size: 1.5cqw;
   color: #6f9fac;
-  margin-top: 4%;
+  margin-top: 2.5%;
 }
 .quest {
   border-top: 1px solid #7dc5d42b;
-  margin-top: 10%;
-  padding-top: 9%;
+  margin-top: 5%;
+  padding-top: 4.5%;
 }
 .quest > span {
   display: block;
-  font-size: 2cqw;
+  font-size: 1.6cqw;
   letter-spacing: 0.5px;
   color: #78cbdc;
 }
 .quest > strong {
   display: block;
-  font-size: 3cqw;
+  font-size: 2.5cqw;
   font-weight: 400;
-  line-height: 1.6;
-  margin: 5% 0 7%;
+  line-height: 1.4;
+  margin: 3% 0 3%;
   overflow-wrap: anywhere;
 }
 .quest > small {
-  font-size: 2.4cqw;
+  font-size: 2cqw;
   color: #c1cda5;
 }
 .webgl-error {

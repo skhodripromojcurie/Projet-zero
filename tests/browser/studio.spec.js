@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { buildHumanoidGlb } from "../fixtures/humanoid-glb.js";
 async function ready(page) {
   await page.goto("./");
   await expect(page.locator("body")).toHaveAttribute("data-ready", "true");
@@ -221,4 +222,85 @@ test("le studio et ses assets sont servis sous le chemin GitHub Pages", async ({
   expect(asset.status()).toBe(200);
   expect(await asset.text()).toContain("Assets futurs");
   expect(failed).toEqual([]);
+});
+
+test("la qualité du rendu change l’image et reste enregistrée", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await ready(page);
+  await seek(page, 2.5);
+  const standard = await page.locator("#scene").screenshot();
+  for (const quality of ["basse", "haute"]) {
+    await page.selectOption('[name="quality"]', quality);
+    expect(standard.equals(await page.locator("#scene").screenshot())).toBe(
+      false,
+    );
+  }
+  await page.getByRole("button", { name: "Enregistrer les réglages" }).click();
+  await page.reload();
+  await expect(page.locator('[name="quality"]')).toHaveValue("haute");
+  expect(errors).toEqual([]);
+});
+
+test("un GLB riggé déclaré avec sa licence remplace le rig procédural", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.route("**/assets/models/manifest.json", (route) =>
+    route.fulfill({
+      json: {
+        version: 1,
+        characters: {
+          adam: {
+            url: "assets/models/fixture-test.glb",
+            profile: "projet-zero",
+            source: "Fixture générée par les tests",
+            author: "Projet Zéro",
+            license: "Fixture de test",
+            commercialUse: true,
+          },
+        },
+      },
+    }),
+  );
+  await page.route("**/assets/models/fixture-test.glb", (route) =>
+    route.fulfill({
+      body: buildHumanoidGlb(),
+      contentType: "model/gltf-binary",
+    }),
+  );
+  await ready(page);
+  await expect(page.locator("#status")).toHaveText("Modèle GLB d’Adam chargé");
+  await expect(page.locator("#character-model-status")).toContainText(
+    "Modèle GLB chargé · Fixture de test · pose · 7 os · 1 expressions",
+  );
+  await seek(page, 5);
+  const image = await page.locator("#scene").screenshot();
+  await seek(page, 1);
+  await seek(page, 5);
+  expect(image.equals(await page.locator("#scene").screenshot())).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test("un modèle sans licence déclarée est refusé et le rig procédural reste actif", async ({
+  page,
+}) => {
+  await page.route("**/assets/models/manifest.json", (route) =>
+    route.fulfill({
+      json: {
+        version: 1,
+        characters: {
+          adam: { url: "assets/models/inconnu.glb", profile: "mixamo" },
+        },
+      },
+    }),
+  );
+  await ready(page);
+  await expect(page.locator("#character-model-status")).toContainText(
+    "rig procédural conservé",
+  );
+  await expect(page.locator("#toast")).toContainText("Modèle GLB non chargé");
 });

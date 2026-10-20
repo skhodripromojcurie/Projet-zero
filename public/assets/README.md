@@ -16,3 +16,10 @@ Pour `public/assets/models/adam.glb`, appeler le chargeur avec
 depuis `src/assets/paths.js`. Ne pas coder `/assets/...` directement dans un `fetch`.
 Garder les ressources externes d’un GLTF (.bin, textures) à leurs chemins relatifs
 et respecter la casse des fichiers. Aucun modèle n’est ajouté par la configuration Pages.
+
+## Manifeste des modèles
+
+`models/manifest.json` déclare les personnages GLB. `"adam": null` signifie que le rig
+procédural est utilisé. Une entrée doit indiquer `url`, `profile`, `source`, `author`,
+`license` et `commercialUse: true` ; sinon le studio refuse le modèle. Contrat complet :
+`docs/personnage-glb.md`.
