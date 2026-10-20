@@ -14,6 +14,7 @@ plan, avant toute intégration dans le plan A01.
 | Pilotage d'un squelette MPFB en pose A par le studio | ✅ testé sur un export Blender réel |
 | Essai sur `Adam_Morel.glb` | ⏳ à faire sur votre PC (le fichier n'est pas dans le dépôt) |
 | Qualité du visage, des plis et des expressions sur le vrai Adam | ⏳ à juger sur les rendus produits |
+| Chargement d'un GLB habillé dans le plan A01 | ✅ essayé localement avec le mannequin habillé : lit, redressement, regard, lumière sans retouche |
 | Intégration d'Adam dans le plan A01 | ⛔ volontairement non faite avant votre validation |
 
 Les scripts ont été mis au point sur un mannequin sans visage. Ils sont robustes sur
@@ -80,6 +81,8 @@ chaussures sont conservés. Pour garder les vêtements d'origine :
 Réglages possibles avant de lancer, dans l'invite de commandes :
 `set PZ_EXCEDENT_TISSU=0.2` (plus de plis), `set PZ_RENDU_RAPIDE=1` (aperçu rapide),
 `set PZ_RENDU_FIN=1` (rendus en pleine résolution).
+
+![Essai d'intégration avec le mannequin habillé](lot2/integration-mannequin.jpg)
 
 ## Après votre validation visuelle
 
