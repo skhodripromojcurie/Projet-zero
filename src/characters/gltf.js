@@ -1,4 +1,5 @@
 import { AnimationMixer } from "three";
+import { publicAssetUrl } from "../assets/paths.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 /** Adapter for future licensed rigged assets. Not wired to the provisional UI.
@@ -6,7 +7,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
  * Model scale/orientation and licences must be checked before library registration.
  */
 export async function loadRiggedCharacter(url, { scale = 1, clips = {} } = {}) {
-  const gltf = await new GLTFLoader().loadAsync(url);
+  const gltf = await new GLTFLoader().loadAsync(publicAssetUrl(url));
   const root = gltf.scene;
   root.scale.setScalar(scale);
   const mixer = new AnimationMixer(root);

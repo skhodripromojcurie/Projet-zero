@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 async function ready(page) {
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator("body")).toHaveAttribute("data-ready", "true");
 }
 async function seek(page, time) {
@@ -193,4 +193,32 @@ test("les objets du décor peuvent être repositionnés et sauvegardés", async 
   await expect(page.locator("#object-z")).toHaveValue("0.3");
   await page.selectOption("#object-selector", "nightstand");
   await expect(page.locator("#object-x")).toHaveValue("0.2");
+});
+
+test("le studio et ses assets sont servis sous le chemin GitHub Pages", async ({
+  page,
+  request,
+  baseURL,
+}) => {
+  const failed = [];
+  page.on("response", (response) => {
+    if (response.status() >= 400)
+      failed.push(`${response.status()} ${response.url()}`);
+  });
+  await ready(page);
+  expect(new URL(page.url()).pathname).toBe("/Projet-zero/");
+  for (const source of await page
+    .locator('script[src], link[rel="stylesheet"]')
+    .evaluateAll((elements) =>
+      elements.map(
+        (element) =>
+          element.getAttribute("src") || element.getAttribute("href"),
+      ),
+    )) {
+    expect(new URL(source, baseURL).pathname).toMatch(/^\/Projet-zero\//);
+  }
+  const asset = await request.get(new URL("assets/README.md", baseURL).href);
+  expect(asset.status()).toBe(200);
+  expect(await asset.text()).toContain("Assets futurs");
+  expect(failed).toEqual([]);
 });

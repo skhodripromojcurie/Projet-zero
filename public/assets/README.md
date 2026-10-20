@@ -7,3 +7,12 @@ Avant d’ajouter un GLB/GLTF, une texture ou un bruitage : consigner sa source,
 sa licence et les obligations d’attribution dans THIRD_PARTY_NOTICES.md. Vérifier
 l’usage commercial, l’orientation, l’échelle métrique et les clips disponibles.
 Les grandes ressources devront être optimisées avant intégration.
+
+## Chemins GitHub Pages
+
+Pour `public/assets/models/adam.glb`, appeler le chargeur avec
+`loadRiggedCharacter("assets/models/adam.glb")`. Il applique la base Vite
+`/Projet-zero/` automatiquement. Pour un autre chargeur, utiliser `publicAssetUrl`
+depuis `src/assets/paths.js`. Ne pas coder `/assets/...` directement dans un `fetch`.
+Garder les ressources externes d’un GLTF (.bin, textures) à leurs chemins relatifs
+et respecter la casse des fichiers. Aucun modèle n’est ajouté par la configuration Pages.
