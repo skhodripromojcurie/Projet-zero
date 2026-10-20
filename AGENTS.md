@@ -36,3 +36,12 @@ Si Chromium système existe : `CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e`
 Les captures sont dans artifacts/ (ignoré). Vérifier aussi visuellement cadrage, lumière,
 notification, affichage téléphone et absence de changements d’apparence entre images.
 Conserver le package-lock.json et préférer npm ci aux installations non verrouillées.
+
+## Déploiement Pages
+
+- `vite.config.js` fixe la base `/Projet-zero/` en développement et production.
+- Les assets publics passent par `publicAssetUrl` dans `src/assets/paths.js` ;
+  conserver les ressources GLTF relatives au modèle.
+- `.github/workflows/pages.yml` publie uniquement depuis `main`, après les tests.
+- Vérifier la version compilée avec `STUDIO_PREVIEW=1 npm run test:e2e` ;
+  les navigations Playwright doivent rester relatives à la base du studio (`./`).
