@@ -10,7 +10,7 @@ plan, avant toute intégration dans le plan A01.
 | Élément | État |
 | --- | --- |
 | Évaluation d'un GLB dans le studio (en pied, gros plan, rapport) | ✅ fonctionne, testé dans Chromium |
-| Scripts Blender : évaluation, habillage, expressions, export | ✅ testés dans le cloud sur un mannequin de test |
+| Scripts Blender : évaluation, habillage, expressions, export | ✅ testés dans le cloud sur un mannequin de test, et à chaque push en CI |
 | Pilotage d'un squelette MPFB en pose A par le studio | ✅ testé sur un export Blender réel |
 | Essai sur `Adam_Morel.glb` | ⏳ à faire sur votre PC (le fichier n'est pas dans le dépôt) |
 | Qualité du visage, des plis et des expressions sur le vrai Adam | ⏳ à juger sur les rendus produits |
@@ -71,6 +71,11 @@ set BLENDER_EXE=C:\Program Files\Blender Foundation\Blender 4.2\blender.exe
 | `habiller_adam.py` | sweat à capuche anthracite et jean sombre : découpe d'après le squelette, tissu posé au-dessus de la peau, simulation de tissu (tombé, volume), plis guidés aux poignets, coudes, ourlet, chevilles et genoux, capuche rabattue, poche kangourou, cordons ; poids du squelette transférés ; peau couverte retirée |
 | `expressions_adam.py` | expressions aux noms ARKit (clignements, yeux écarquillés, sourcils, mâchoire, commissures), déduites de la position des yeux — **expérimental** |
 | `mannequin_test.py` | mannequin de test créé par le projet, pour éprouver les scripts |
+
+Si `Adam_Morel.glb` porte déjà des vêtements MPFB, ils sont **retirés et remplacés**
+par le sweat et le jean (la liste s'affiche) ; cheveux, sourcils, cils, yeux, dents et
+chaussures sont conservés. Pour garder les vêtements d'origine :
+`set PZ_GARDER_VETEMENTS=1`.
 
 Réglages possibles avant de lancer, dans l'invite de commandes :
 `set PZ_EXCEDENT_TISSU=0.2` (plus de plis), `set PZ_RENDU_RAPIDE=1` (aperçu rapide),
