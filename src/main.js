@@ -8,6 +8,7 @@ import { DEFAULT_CONFIG, sanitizeConfig } from "./scenes/config.js";
 import { advance } from "./animations/timeline.js";
 import { readCharacterEntry } from "./characters/registry.js";
 import { loadRiggedCharacter } from "./characters/gltf.js";
+import { mountEvaluator } from "./ui/evaluator.js";
 
 mountLayout(document.querySelector("#app"));
 const $ = (selector) => document.querySelector(selector);
@@ -20,6 +21,7 @@ let time = 0,
 let toastTimer;
 let characterStatus = "Rig procédural v2 actif · aucun modèle GLB déclaré.";
 const audio = createAudio();
+const evaluator = mountEvaluator($("#evaluator"), (message) => notify(message));
 function notify(message) {
   $("#toast").textContent = message;
   $("#toast").classList.add("visible");
@@ -239,7 +241,16 @@ function switchLibrary(tab) {
     button.classList.toggle("active", selected);
     button.setAttribute("aria-pressed", String(selected));
   });
-  renderLibrary(tab, $("#library-content"), selectCamera, characterStatus);
+  renderLibrary(
+    tab,
+    $("#library-content"),
+    selectCamera,
+    characterStatus,
+    (file) => {
+      setPlaying(false);
+      evaluator.open(file);
+    },
+  );
 }
 document
   .querySelectorAll("[data-tab]")

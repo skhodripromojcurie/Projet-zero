@@ -10,9 +10,15 @@ const stats = [
   ["Compétences", "Aucune"],
   ["Menace infectés", "Inconnue"],
 ];
-export function renderLibrary(tab, container, onCamera, characterStatus = "") {
+export function renderLibrary(
+  tab,
+  container,
+  onCamera,
+  characterStatus = "",
+  onEvaluate = null,
+) {
   if (tab === "characters") {
-    container.innerHTML = `<div class="section-label">DANS CE PROJET</div><div class="character-card"><div class="avatar-art"><span class="avatar-halo"></span><span class="avatar-body"></span><span class="avatar-head"></span><span class="avatar-neck"></span><span class="avatar-label">RIG 002</span><span class="avatar-type">3D</span></div><div class="asset-description"><strong>Adam Morel</strong><span>Personnage principal</span><small><i class="status-dot"></i> Articulé · version provisoire</small></div></div><p class="model-status" id="character-model-status"></p><div class="section-label upcoming-label">PERSONNAGES PRÉVUS</div>${CHARACTER_LIBRARY.filter(
+    container.innerHTML = `<div class="section-label">DANS CE PROJET</div><div class="character-card"><div class="avatar-art"><span class="avatar-halo"></span><span class="avatar-body"></span><span class="avatar-head"></span><span class="avatar-neck"></span><span class="avatar-label">RIG 002</span><span class="avatar-type">3D</span></div><div class="asset-description"><strong>Adam Morel</strong><span>Personnage principal</span><small><i class="status-dot"></i> Articulé · version provisoire</small></div></div><p class="model-status" id="character-model-status"></p><label class="evaluate-button">Évaluer un GLB local… <input id="evaluate-glb" type="file" accept=".glb,model/gltf-binary" /></label><p class="model-status">Aperçu en pied et en gros plan, lu sur cet appareil uniquement.</p><div class="section-label upcoming-label">PERSONNAGES PRÉVUS</div>${CHARACTER_LIBRARY.filter(
       (c) => !c.available,
     )
       .map(
@@ -24,6 +30,12 @@ export function renderLibrary(tab, container, onCamera, characterStatus = "") {
       )}<div class="library-note">Le modèle provisoire pourra être remplacé par un personnage GLB riggé, déclaré avec sa licence dans assets/models/manifest.json.</div>`;
     container.querySelector("#character-model-status").textContent =
       characterStatus;
+    container
+      .querySelector("#evaluate-glb")
+      .addEventListener("change", (event) => {
+        onEvaluate?.(event.target.files[0]);
+        event.target.value = "";
+      });
   } else if (tab === "environments") {
     container.innerHTML = `<div class="section-label">DÉCOR ACTIF</div><div class="asset-tile">${icon("room")}<h3>Appartement d’Adam</h3><p>France · petit matin</p><span class="asset-tag">GÉOMÉTRIE PROCÉDURALE</span></div><ul class="object-list"><li>Lit, couette drapée & oreillers</li><li>Chevet, réveil 06:42, téléphone & verre</li><li>Fenêtre, rideaux, radiateur & rue à l’aube</li><li>Porte, commode, chaise & sac à dos</li><li>Aube froide, lampe chaude & réverbère orange</li><li>Faisceau de lumière & poussière</li></ul><div class="library-note">Chaque objet est un composant indépendant du décor.</div>`;
   } else if (tab === "cameras") {

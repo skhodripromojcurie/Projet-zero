@@ -87,6 +87,7 @@ export function mountLayout(app) {
       </aside>
     </main>
     <footer class="statusbar"><span><span class="status-dot"></span> <span id="status">Prêt à créer</span></span><span>RIG PROVISOIRE · SANS ASSET EXTERNE</span><span>PROJET ZÉRO STUDIO <b>v0.1.0</b></span></footer>
+    <div id="evaluator" class="evaluator" hidden></div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   `;
 }

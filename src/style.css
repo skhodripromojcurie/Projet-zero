@@ -1728,3 +1728,129 @@ textarea {
     border-left: 1px solid var(--line);
   }
 }
+/* Local GLB evaluation: candidate character in full body and close-up. */
+.evaluate-button {
+  display: block;
+  margin: 12px 20px 0;
+  padding: 9px 10px;
+  border: 1px solid #4d5a50;
+  color: #c9d3c6;
+  font-size: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+.evaluate-button:hover,
+.evaluate-button:focus-within {
+  border-color: var(--gold);
+  color: #e2c89c;
+}
+.evaluate-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.evaluator {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: #050708cc;
+}
+.evaluator[hidden] {
+  display: none;
+}
+.evaluator-panel {
+  width: min(1180px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 18px 20px 20px;
+}
+.evaluator-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.evaluator-head h2 {
+  margin: 4px 0 2px;
+  font-size: 20px;
+  font-weight: 400;
+}
+.evaluator-file {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.evaluator-note {
+  margin: 10px 0 14px;
+  font-size: 10px;
+  color: #9fb0a6;
+}
+.evaluator-body {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+  gap: 18px;
+}
+.evaluator-views {
+  grid-row: span 2;
+  position: relative;
+}
+.evaluator-views canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 8;
+  background: #14191c;
+}
+.evaluator-labels {
+  display: flex;
+  justify-content: space-around;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.evaluator-controls {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+.evaluator-report h3 {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--gold);
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+.evaluator-report dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  margin: 0 0 14px;
+  font-size: 11px;
+}
+.evaluator-report dt {
+  color: var(--muted);
+}
+.evaluator-report dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.evaluator-report ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 11px;
+  color: #d9c8a4;
+}
+@media (max-width: 760px) {
+  .evaluator-body {
+    grid-template-columns: 1fr;
+  }
+  .evaluator-views {
+    grid-row: auto;
+  }
+}

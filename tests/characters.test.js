@@ -180,3 +180,24 @@ test("un export Blender au squelette MPFB en pose A est redressé et piloté", a
   }
   model.dispose();
 });
+
+test("le rapport d’évaluation détecte le squelette MPFB et signale les manques", async (t) => {
+  const { readFile } = await import("node:fs/promises");
+  const { inspectModel } = await import("../src/characters/inspect.js");
+  const body = await readFile(
+    new URL("./fixtures/mannequin-mpfb.glb", import.meta.url),
+  );
+  const model = await loadRiggedCharacter(await serve(t, body), {
+    profile: "mpfb",
+  });
+  const report = inspectModel(model.root, []);
+  assert.equal(report.bestProfile, "mpfb");
+  assert.equal(report.profiles.mpfb.found, JOINTS.length);
+  assert.equal(report.bones, 19);
+  assert.ok(
+    report.height > 1.6 && report.height < 1.95,
+    `hauteur ${report.height}`,
+  );
+  assert.ok(report.warnings.some((w) => w.includes("ARKit")));
+  model.dispose();
+});
