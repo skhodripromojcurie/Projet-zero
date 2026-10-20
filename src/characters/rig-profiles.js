@@ -1,6 +1,7 @@
 // Bone-name maps from the normalised humanoid joints to rigged GLB skeletons.
-// `rest` corrects a skeleton whose bind pose differs from the reference
-// (standing, arms hanging): Euler angles in the character frame.
+// Limbs bound in T-pose or A-pose are straightened automatically by the
+// loader (`alignLimbs`, on by default). `rest` adds explicit corrections:
+// Euler angles in the character frame, applied before the alignment.
 const sides = (pattern) =>
   Object.fromEntries(
     [
@@ -55,12 +56,13 @@ export const RIG_PROFILES = {
       }),
     },
     eyes: ["mixamorigLeftEye", "mixamorigRightEye"],
-    // T-pose bind: arms are horizontal.
-    rest: { upperArmL: [0, 0, Math.PI / 2], upperArmR: [0, 0, -Math.PI / 2] },
+    // T-pose bind: the arms are straightened by alignLimbs.
+    rest: {},
   },
-  // MPFB 2 "game engine" skeleton. To validate on the real Lot 2 export.
+  // MPFB 2 "game engine" skeleton (A-pose bind). Checked on a Blender export
+  // of the test mannequin; to confirm on Adam's real MPFB export.
   mpfb: {
-    label: "MPFB 2 · game engine (à valider)",
+    label: "MPFB 2 · game engine",
     bones: {
       hips: "pelvis",
       spine: "spine_01",

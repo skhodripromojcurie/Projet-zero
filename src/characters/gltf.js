@@ -6,6 +6,17 @@ import { RIG_PROFILES } from "./rig-profiles.js";
 import { ADAM_BASE } from "./adam.js";
 
 const euler = new Euler();
+// Parent first: each limb segment and the joint that ends it.
+const LIMBS = [
+  ["upperArmL", "forearmL"],
+  ["upperArmR", "forearmR"],
+  ["forearmL", "handL"],
+  ["forearmR", "handR"],
+  ["thighL", "shinL"],
+  ["thighR", "shinR"],
+  ["shinL", "footL"],
+  ["shinR", "footR"],
+];
 const delta = new Quaternion();
 const local = new Quaternion();
 
@@ -64,6 +75,26 @@ export async function loadRiggedCharacter(
     const binding = bindBone(bone, rootInverse);
     setFromEuler(delta, rest).invert();
     bone.quaternion.multiply(toBoneFrame(binding, delta, local));
+  }
+  // T-pose and A-pose binds: limbs are turned to hang straight down, as in
+  // the reference pose, measured from the joints rather than assumed.
+  if (rig.alignLimbs !== false) {
+    const down = new Vector3(0, -1, 0);
+    const from = new Vector3();
+    const to = new Vector3();
+    for (const [joint, child] of LIMBS) {
+      const bone = find(rig.bones[joint]);
+      const next = find(rig.bones[child]);
+      if (!bone || !next) continue;
+      root.updateMatrixWorld(true);
+      bone.getWorldPosition(from);
+      next.getWorldPosition(to);
+      const direction = to.sub(from).applyQuaternion(rootInverse).normalize();
+      if (direction.lengthSq() < 0.5) continue;
+      const binding = bindBone(bone, rootInverse);
+      delta.setFromUnitVectors(direction, down);
+      bone.quaternion.multiply(toBoneFrame(binding, delta, local));
+    }
   }
   root.updateMatrixWorld(true);
   const bones = {};

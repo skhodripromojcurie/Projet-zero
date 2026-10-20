@@ -147,3 +147,36 @@ test("un modèle n’est accepté qu’avec sa provenance et sa licence commerci
     /refusé/,
   );
 });
+
+test("un export Blender au squelette MPFB en pose A est redressé et piloté", async (t) => {
+  // tests/fixtures/mannequin-mpfb.glb : produit par tools/blender/mannequin_test.py
+  // (mannequin créé par le projet, pas un asset tiers).
+  const { readFile } = await import("node:fs/promises");
+  const body = await readFile(
+    new URL("./fixtures/mannequin-mpfb.glb", import.meta.url),
+  );
+  const model = await loadRiggedCharacter(await serve(t, body), {
+    profile: "mpfb",
+  });
+  assert.equal(model.report.joints.length, JOINTS.length);
+  model.applyPose(createPose(), config, 0);
+  model.root.updateMatrixWorld(true);
+  const at = (name) =>
+    model.root.getObjectByName(name).getWorldPosition(new Vector3());
+  for (const side of ["l", "r"]) {
+    const shoulder = at(`upperarm_${side}`);
+    const elbow = at(`lowerarm_${side}`);
+    const wrist = at(`hand_${side}`);
+    // Bras le long du corps : coude et poignet sous l'épaule.
+    assert.ok(Math.abs(elbow.x - shoulder.x) < 0.01, `coude ${side}`);
+    assert.ok(Math.abs(wrist.x - shoulder.x) < 0.01, `poignet ${side}`);
+    assert.ok(elbow.y < shoulder.y && wrist.y < elbow.y);
+  }
+  assert.ok(at("pelvis").distanceTo(new Vector3(...ADAM_BASE)) < 1e-6);
+  for (const time of [0, 1.5, 2.3, 5, 7.5]) {
+    model.applyPose(sampleShot(time), config, time);
+    model.root.updateMatrixWorld(true);
+    assert.ok(Number.isFinite(at("head").y), `tête à ${time}`);
+  }
+  model.dispose();
+});
