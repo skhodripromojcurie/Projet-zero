@@ -8,9 +8,9 @@ export const CAMERA_PRESETS = {
   },
   portrait: {
     label: "A02 · Visage d’Adam",
-    position: [-0.32, 1.42, -0.42],
-    target: [0.5, 1.2, -1.75],
-    fov: 36,
+    position: [-0.4, 1.45, -0.36],
+    target: [0.56, 1.17, -1.74],
+    fov: 43,
   },
   window: {
     label: "A03 · La fenêtre",
