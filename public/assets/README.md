@@ -1,7 +1,10 @@
-# Assets futurs
+# Assets
 
-Aucun modèle, animation, texture, son ou police externe n’est requis par le prototype.
-Tout est généré localement dans le code. Le cri est un son synthétique provisoire.
+`models/Adam_Morel.glb` : Adam Morel définitif (lot 3), généré par
+`tools/mpfb/construire_adam.py` (MPFB 2, ressources CC0, création du projet ; détail
+dans THIRD_PARTY_NOTICES.md). Il remplace le rig procédural dans le plan A01. Le rig
+procédural reste le secours si le fichier manque ou est refusé.
+Aucune autre ressource externe n’est requise. Le cri est un son synthétique provisoire.
 
 Avant d’ajouter un GLB/GLTF, une texture ou un bruitage : consigner sa source, son auteur,
 sa licence et les obligations d’attribution dans THIRD_PARTY_NOTICES.md. Vérifier

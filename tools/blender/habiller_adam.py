@@ -616,8 +616,11 @@ def habiller(entree, sortie, sortie_glb=None):
     print(f"Vêtements : sweat {len(sweat.data.vertices)} sommets, jean {len(jean.data.vertices)} sommets.")
 
 
-def exporter_glb(chemin):
-    """Export pour le navigateur : squelette, poids, expressions ; ni caméra ni lumière."""
+def exporter_glb(chemin, **options):
+    """Export pour le navigateur : squelette, poids, expressions ; ni caméra ni lumière.
+
+    « options » complète ou remplace les réglages de l'exportateur glTF de Blender.
+    """
     os.makedirs(os.path.dirname(os.path.abspath(chemin)) or ".", exist_ok=True)
     bpy.ops.export_scene.gltf(
         filepath=os.path.abspath(chemin),
@@ -628,6 +631,7 @@ def exporter_glb(chemin):
         export_morph=True,
         export_animations=False,
         export_apply=False,
+        **options,
     )
 
 

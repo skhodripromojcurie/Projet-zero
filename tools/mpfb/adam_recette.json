@@ -1,8 +1,10 @@
 {
-  "version": 1,
+  "version": 2,
   "nom": "Adam Morel",
   "description": "Homme européen de 29 ans, 1,78 m, morphologie moyenne et mince. Les valeurs de « visage » sont l'identité commune ; chaque variante ajoute ses écarts. Une valeur positive charge la cible « -incr » (ou la cible du même nom), une valeur négative la cible « -decr » ; « lr- » applique la même valeur aux côtés gauche et droit.",
   "mpfb": "2.0.18",
+  "variante_retenue": "A",
+  "statut": "Visage validé le 21/10/2026 : variante A, sans retouche. Les valeurs de « visage » sont figées ; les modifier changerait l'identité d'Adam. Les autres variantes restent pour mémoire.",
   "taille_m": 1.78,
   "macros": {
     "gender": 1.0,
@@ -71,8 +73,19 @@
     "longueur_dessus_mm": 45,
     "longueur_cotes_mm": 18,
     "desordre": 0.6,
-    "graine": 29
+    "graine": 29,
+    "cartes": [1150, 800, 500],
+    "largeur_mm": [11, 17]
   },
-  "barbe": { "densite": 1.35, "couleur": [0.035, 0.022, 0.015] },
-  "squelette": "game_engine"
+  "barbe": { "densite": 1.35, "couleur": [0.035, 0.022, 0.015], "opacite_peinte": 0.6 },
+  "bouche": { "dents": [0.8, 0.76, 0.68], "langue": [0.42, 0.15, 0.14] },
+  "squelette": "game_engine",
+  "export": {
+    "peau_px": 2048,
+    "yeux_px": 1024,
+    "qualite_images": 85,
+    "teinte_peau": [0.93, 0.87, 0.82],
+    "rugosite_peau": 0.58,
+    "allegement": { "Sweat à capuche": 0.45, "Capuche": 0.3, "Jean": 0.5, "Poche": 0.5 }
+  }
 }

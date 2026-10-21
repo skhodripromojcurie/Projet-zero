@@ -56,10 +56,36 @@ function setFromEuler(target, [x, y, z]) {
  */
 export async function loadRiggedCharacter(
   url,
-  { scale = 1, profile = "projet-zero", clips = {}, morphAliases = {} } = {},
+  {
+    scale = 1,
+    profile = "projet-zero",
+    clips = {},
+    morphAliases = {},
+    alphaHash = false,
+  } = {},
 ) {
   const gltf = await new GLTFLoader().loadAsync(publicAssetUrl(url));
   const root = gltf.scene;
+  // Skinned bounds are computed once, in the bind pose: once the bones move
+  // the character (lying down, sitting up), meshes such as the hair would be
+  // culled although visible.
+  root.traverse((object) => {
+    if (object.isSkinnedMesh) object.frustumCulled = false;
+  });
+  // Hair cards: dithered transparency, depth-tested like opaque surfaces, so
+  // thousands of overlapping strands need no sorting (stable from frame to frame).
+  // `alphaHash`: true for every textured transparent material, or material names.
+  const hashed = (material) =>
+    Array.isArray(alphaHash) ? alphaHash.includes(material.name) : alphaHash;
+  if (alphaHash)
+    root.traverse((object) => {
+      for (const material of [object.material].flat())
+        if (material?.transparent && material.map && hashed(material)) {
+          material.alphaHash = true;
+          material.transparent = false;
+          material.depthWrite = true;
+        }
+    });
   root.scale.setScalar(scale);
   root.updateMatrixWorld(true);
   const rig = RIG_PROFILES[profile];

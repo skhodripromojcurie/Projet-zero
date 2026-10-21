@@ -240,7 +240,8 @@ export function mountEvaluator(host, notify) {
   async function load(profile) {
     model?.dispose();
     if (model) holder.remove(model.root);
-    model = await loadRiggedCharacter(url, { profile });
+    // Character GLBs: transparent textures are hair cards, drawn dithered.
+    model = await loadRiggedCharacter(url, { profile, alphaHash: true });
     holder.add(model.root);
     model.root.traverse((object) => {
       if (object.isMesh) object.castShadow = object.receiveShadow = true;

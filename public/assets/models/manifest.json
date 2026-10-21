@@ -1,6 +1,16 @@
 {
   "version": 1,
   "characters": {
-    "adam": null
+    "adam": {
+      "url": "assets/models/Adam_Morel.glb",
+      "profile": "mpfb",
+      "source": "Création Projet Zéro · MPFB 2.0.18 (ressources CC0) et scripts tools/mpfb",
+      "author": "Projet Zéro",
+      "license": "CC0 1.0 (base MakeHuman) · création originale",
+      "commercialUse": true,
+      "alphaHash": ["Cheveux", "Sourcils", "Cils"],
+      "clips": {},
+      "morphAliases": {}
+    }
   }
 }
