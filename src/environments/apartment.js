@@ -93,7 +93,7 @@ export function createApartment(scene) {
   box(bed, "Sommier", [1.65, 0.28, 2.25], [0, 0.32, 0], wood);
   box(bed, "Matelas", [1.61, 0.22, 2.2], [0, 0.57, 0], material("#b2b2a2"));
   box(bed, "Tête de lit", [1.75, 1.1, 0.12], [0, 0.6, -1.15], wood);
-  dressBed(bed);
+  const duvet = dressBed(bed);
   const nightstand = group(room, "Table de chevet", [-0.72, 0, -2.12]);
   box(nightstand, "Caisson", [0.65, 0.6, 0.56], [0, 0.3, 0], wood);
   box(
@@ -236,6 +236,7 @@ export function createApartment(scene) {
     windowGlow,
     shaft,
     sodium: exterior.sodium,
+    duvet,
     objects: { bed, nightstand, door, window: windowGroup },
   };
 }

@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { box, sphere, group, material, canvasTexture } from "./objects.js";
 import { seeded, fabricTexture } from "../characters/adam-parts.js";
-import { noise } from "../animations/curves.js";
+import { createDuvet } from "./duvet.js";
 
 export function parquetTexture() {
   const random = seeded(23);
@@ -32,41 +32,6 @@ export function parquetTexture() {
   return texture;
 }
 
-/** Duvet sheet draped over Adam's legs and over the mattress edges (bed-local). */
-function duvetGeometry() {
-  const geometry = new THREE.PlaneGeometry(2.1, 1.75, 70, 56);
-  geometry.rotateX(-Math.PI / 2);
-  const p = geometry.attributes.position;
-  for (let i = 0; i < p.count; i++) {
-    const s = p.getX(i);
-    const zRaw = p.getZ(i) + 0.48; // -0.395 … 1.355
-    const edgeX = 0.83;
-    const edgeZ = 1.12;
-    let x = s,
-      z = zRaw;
-    let y =
-      0.875 -
-      0.11 * Math.max(0, (Math.abs(s) - 0.62) / 0.21) ** 2 +
-      0.035 * Math.exp(-(((s + 0.24) / 0.1) ** 2)) * (1 - zRaw) +
-      0.035 * Math.exp(-(((s + 0.06) / 0.1) ** 2)) * (1 - zRaw) +
-      0.018 * noise(s * 7 + zRaw * 3, 4) +
-      0.012 * noise(zRaw * 9, 8) -
-      0.04 * Math.max(0, zRaw - 0.85);
-    y += 0.03 * Math.exp(-(((zRaw + 0.12) / 0.07) ** 2));
-    if (Math.abs(s) > edgeX) {
-      x = Math.sign(s) * (edgeX + 0.025);
-      y = 0.765 - (Math.abs(s) - edgeX) * 1.9;
-    }
-    if (zRaw > edgeZ) {
-      z = edgeZ + 0.025;
-      y = Math.min(y, 0.765) - (zRaw - edgeZ) * 1.6;
-    }
-    p.setXYZ(i, x, y, z);
-  }
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
 export function dressBed(bed) {
   const sheet = material("#b9bab2", 0.95, {
     map: fabricTexture("#bdbdb4", "#c9c9c1", "#a9aaa2", 13, 6),
@@ -76,20 +41,7 @@ export function dressBed(bed) {
     map: fabricTexture("#4a565b", "#56626a", "#3a4448", 19, 5),
     side: THREE.DoubleSide,
   });
-  const duvet = new THREE.Mesh(duvetGeometry(), duvetMat);
-  duvet.name = "Couette";
-  duvet.castShadow = duvet.receiveShadow = true;
-  bed.add(duvet);
-  const fold = new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.055, 1.55, 6, 16),
-    duvetMat,
-  );
-  fold.name = "Revers de couette";
-  fold.rotation.z = Math.PI / 2;
-  fold.scale.set(1, 1, 0.7);
-  fold.position.set(0, 0.86, -0.36);
-  fold.castShadow = fold.receiveShadow = true;
-  bed.add(fold);
+  const duvet = createDuvet(bed, duvetMat);
   const pillowMat = material("#c3c3bb", 0.95, {
     map: fabricTexture("#c6c6be", "#d2d2ca", "#b0b1a9", 31, 3),
   });
@@ -108,6 +60,7 @@ export function dressBed(bed) {
     [0.42, 0.77, -0.86],
     pillowMat,
   ).rotation.y = 0.15;
+  return duvet;
 }
 
 export function dressNightstand(nightstand) {

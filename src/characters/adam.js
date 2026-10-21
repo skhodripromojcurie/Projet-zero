@@ -231,5 +231,9 @@ export function createAdam() {
       for (const name of JOINTS) j[name].rotation.set(...pose.joints[name]);
       face.setFace(pose.face, pose.gaze);
     },
+    /** World position of a normalised joint (used by the duvet drape). */
+    jointPosition(name, target) {
+      return j[name].getWorldPosition(target);
+    },
   };
 }

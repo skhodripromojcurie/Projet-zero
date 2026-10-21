@@ -62,11 +62,13 @@ export function sampleA01(time, duration = 8, intensity = 1) {
   j.neck[0] = mix(0.32, 0.06, rise) + 0.12 * curl;
   j.head[1] = -0.32 * (1 - smoother(0.4, 1.4, t));
   j.head[2] = 0.08 * (1 - smoother(0.4, 1.4, t));
-  // Legs stay put under the duvet: thighs cancel the hips rotation.
-  const legPitch = -Math.PI / 2 + 0.06 + 0.1 * rise;
+  // Legs stay put under the duvet: thighs cancel the hips rotation. They lie
+  // flat on the mattress (heels on the sheet); the knees lift a little as
+  // Adam sits up.
+  const legPitch = -Math.PI / 2 - 0.03 - 0.1 * rise;
   for (const side of ["L", "R"]) {
     j[`thigh${side}`][0] = legPitch - j.hips[0];
-    j[`shin${side}`][0] = 0.12 * rise;
+    j[`shin${side}`][0] = 0.25 * rise;
     j[`foot${side}`][0] = -0.25;
   }
   // Arms push on the mattress, then hands come to rest on the duvet.
