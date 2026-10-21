@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "nom": "Adam Morel",
+  "description": "Homme européen de 29 ans, 1,78 m, morphologie moyenne et mince. Les valeurs de « visage » sont l'identité commune ; chaque variante ajoute ses écarts. Une valeur positive charge la cible « -incr » (ou la cible du même nom), une valeur négative la cible « -decr » ; « lr- » applique la même valeur aux côtés gauche et droit.",
+  "mpfb": "2.0.18",
+  "taille_m": 1.78,
+  "macros": {
+    "gender": 1.0,
+    "age": 0.5308,
+    "muscle": 0.52,
+    "weight": 0.42,
+    "proportions": 0.62,
+    "height": 0.55,
+    "cupsize": 0.5,
+    "firmness": 0.5,
+    "race": { "asian": 0.0, "caucasian": 1.0, "african": 0.0 }
+  },
+  "visage": {
+    "head-rectangular": 0.25,
+    "head-scale-horiz": -0.08,
+    "chin-width": 0.15,
+    "chin-height": 0.1,
+    "lr-cheek-bones": 0.25,
+    "lr-cheek-volume": -0.2,
+    "nose-scale-vert": 0.15,
+    "nose-hump": 0.2,
+    "nose-point-width": -0.1,
+    "mouth-upperlip-volume": -0.1,
+    "mouth-scale-horiz": 0.05,
+    "lr-eye-bag": 0.25,
+    "lr-eye-height2": -0.1,
+    "eyebrows-trans-down": 0.15,
+    "forehead-temple": 0.15
+  },
+  "variantes": {
+    "A": { "nom": "Référence", "visage": {} },
+    "B": {
+      "nom": "Mâchoire marquée",
+      "visage": { "chin-width": 0.25, "chin-prominent": 0.3, "head-square": 0.3, "lr-cheek-bones": 0.15 }
+    },
+    "C": {
+      "nom": "Visage plus fin",
+      "visage": { "head-oval": 0.4, "chin-triangle": 0.2, "lr-cheek-volume": -0.25, "nose-point-width": -0.15 }
+    },
+    "D": {
+      "nom": "Nez plus long",
+      "visage": { "nose-hump": 0.3, "nose-scale-vert": 0.2, "nose-point-down": 0.25, "nose-scale-depth": 0.15 }
+    },
+    "E": {
+      "nom": "Regard fatigué",
+      "visage": { "lr-eye-bag": 0.35, "lr-eye-push1-in": 0.3, "eyebrows-trans-down": 0.2, "lr-eye-eyefold-down": 0.25 }
+    },
+    "F": {
+      "nom": "Traits plus doux",
+      "visage": { "head-round": 0.25, "mouth-lowerlip-volume": 0.25, "chin-prominent": -0.2, "lr-eye-scale": 0.12 }
+    }
+  },
+  "peau": {
+    "couleur": [0.62, 0.43, 0.33],
+    "levres": [0.55, 0.3, 0.26],
+    "rugosite": 0.42
+  },
+  "yeux": {
+    "mhclo": "eyes/high-poly/high-poly.mhclo",
+    "iris_principal": [0.16, 0.085, 0.035],
+    "iris_secondaire": [0.07, 0.035, 0.014],
+    "iris_bord": [0.025, 0.015, 0.008]
+  },
+  "cheveux": {
+    "couleur": [0.17, 0.1, 0.055],
+    "longueur_dessus_mm": 45,
+    "longueur_cotes_mm": 18,
+    "desordre": 0.6,
+    "graine": 29
+  },
+  "barbe": { "densite": 1.35, "couleur": [0.035, 0.022, 0.015] },
+  "squelette": "game_engine"
+}
