@@ -148,6 +148,11 @@ le terminal n’affiche que le domaine. Les tests navigateur ci-dessous contrôl
 
 Comparaisons avant/après du lot 1 : [docs/lot1](docs/lot1).
 
+**Lot 2 (en cours)** : évaluation locale d'un personnage GLB dans le studio
+(*Bibliothèque › Personnages › Évaluer un GLB local…*) et scripts Blender qui
+habillent Adam et lui ajoutent des expressions, sans modélisation manuelle :
+voir [docs/lot2-adam.md](docs/lot2-adam.md).
+
 ## Limites assumées
 
 C’est un **prototype fonctionnel et un animatique en primitives**, pas un personnage

@@ -5,7 +5,9 @@ L’appartement, le rig provisoire v2, toutes les textures (murs, parquet, tissu
 cheveux, barbe, façade, ciel), le portrait CSS illustratif de la bibliothèque et le son
 synthétique sont produits par le code du projet. L’environnement de reflets est généré
 par `RoomEnvironment` de three.js, sans image HDR externe. Le mannequin GLB des tests
-(`tests/fixtures/humanoid-glb.js`) est écrit octet par octet par le projet.
+(`tests/fixtures/humanoid-glb.js`) est écrit octet par octet par le projet, et
+`tests/fixtures/mannequin-mpfb.glb` est produit par `tools/blender/mannequin_test.py`
+(création du projet ; seuls les noms d'os suivent la convention MPFB).
 Aucun service payant ni clé API n’est nécessaire. Les références créatives du brief ne
 sont pas des assets inclus et ne confèrent aucun droit sur des contenus tiers.
 
@@ -16,6 +18,7 @@ Dépendances libres (versions exactes dans package-lock.json) :
 | three            | Rendu 3D, chargeur GLTF, post-traitement et environnement (addons) | MIT |
 | vite             | Serveur et compilation    | MIT        |
 | @playwright/test | Tests navigateur          | Apache-2.0 |
+| bpy (Blender, hors dépôt) | Exécution des scripts `tools/blender` | GPL-3.0 ; les fichiers produits appartiennent à leur auteur |
 
 Les avis complets des dépendances et dépendances transitives restent dans leurs
 paquets npm. Conserver les avis applicables lors d’une redistribution. Une future

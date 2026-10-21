@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 import { buildHumanoidGlb } from "../fixtures/humanoid-glb.js";
 async function ready(page) {
   await page.goto("./");
@@ -303,4 +304,47 @@ test("un modèle sans licence déclarée est refusé et le rig procédural reste
     "rig procédural conservé",
   );
   await expect(page.locator("#toast")).toContainText("Modèle GLB non chargé");
+});
+
+test("un GLB local s’évalue en pied et en gros plan sans quitter l’appareil", async ({
+  page,
+}) => {
+  const errors = [];
+  const uploads = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("request", (request) => {
+    if (request.method() !== "GET") uploads.push(request.url());
+  });
+  await ready(page);
+  const body = await readFile(
+    new URL("../fixtures/mannequin-mpfb.glb", import.meta.url),
+  );
+  await page.locator("#evaluate-glb").setInputFiles({
+    name: "mannequin-mpfb.glb",
+    mimeType: "model/gltf-binary",
+    buffer: body,
+  });
+  await expect(page.locator("#evaluator")).toHaveAttribute(
+    "data-ready",
+    "true",
+  );
+  await expect(page.locator("#evaluator-facts")).toContainText("19 / 19");
+  await expect(page.locator("#evaluator-facts")).toContainText("MPFB 2");
+  await expect(page.locator("#evaluator-warnings")).toContainText("ARKit");
+  await page.screenshot({ path: "artifacts/evaluation-glb.png" });
+  const rest = await page.locator("#evaluator-canvas").screenshot();
+  await page.selectOption("#evaluator-pose", "shot");
+  await expect
+    .poll(async () =>
+      rest.equals(await page.locator("#evaluator-canvas").screenshot()),
+    )
+    .toBe(false);
+  await page.getByRole("button", { name: "Fermer l’évaluation" }).click();
+  await expect(page.locator("#evaluator")).toBeHidden();
+  // Adam procédural reste dans le plan.
+  await expect(page.locator("#character-model-status")).toContainText(
+    "Rig procédural v2 actif",
+  );
+  expect(uploads).toEqual([]);
+  expect(errors).toEqual([]);
 });
