@@ -34,3 +34,18 @@ Rien n’est téléchargé tant que la licence n’a pas été revérifiée à l
 - Mixamo (compte Adobe gratuit) : usage commercial autorisé dans un projet, mais les
   fichiers bruts ne doivent pas être redistribués. Aucun fichier Mixamo brut ne sera
   publié dans ce dépôt public ; seules des animations intégrées et retravaillées.
+
+## Lot 3 · Adam Morel avec MPFB (outils, hors studio)
+
+Les scripts `tools/mpfb` utilisent MPFB 2 et des ressources MakeHuman, lues depuis
+leur installation, sans copie dans ce dépôt :
+
+| Élément | Source | Licence |
+| --- | --- | --- |
+| MPFB 2.0.18 (code) | github.com/makehumancommunity/mpfb2 | GPL-3.0 |
+| Maillage de base, cibles, squelettes, unités d'expression | github.com/makehumancommunity/mpfb2 | CC0 1.0 |
+| Yeux « high-poly » et texture d'iris brune | github.com/makehumancommunity/makehuman | CC0 1.0 |
+
+L'équipe MakeHuman ne revendique aucun droit sur les sorties de MPFB (modèles,
+rendus, exports). Cheveux, sourcils, cils, barbe et leurs textures sont générés par
+`tools/mpfb/pilosite.py` (création du projet).
