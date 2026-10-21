@@ -43,6 +43,23 @@ Une fois la variante choisie, ses valeurs sont figées dans la recette.
 | `rendus_visage.py` | rendus face, trois-quarts, profil, yeux, bouche, cadrés sur les repères |
 | `generer_variantes.py` / `.bat` | les six variantes, leurs rendus et `comparaison.html` |
 
+## Résultat : six visages réels
+
+![Six variantes](lot3/variantes-ensemble.jpg)
+
+Planches détaillées (face, trois-quarts, profil, yeux, bouche) :
+[A](lot3/variante-A.jpg) · [B](lot3/variante-B.jpg) · [C](lot3/variante-C.jpg) ·
+[D](lot3/variante-D.jpg) · [E](lot3/variante-E.jpg) · [F](lot3/variante-F.jpg).
+
+Expressions (variante A), pilotées par les canaux du studio :
+
+![Expressions](lot3/expressions-A.jpg)
+
+Vérifié : taille 1,78 m exacte, 10 expressions issues des unités MPFB, poils qui
+suivent les expressions, squelette « game engine » de 53 os dont les 19 os du profil
+`mpfb` du studio. Défauts constatés : bouche ouverte sans dents ni langue, sourcils
+qui suivent trop peu le haut du front.
+
 ## Consulter les variantes sans Blender
 
 - Dans la pull request : planches `docs/lot3/variante-*.jpg`.
