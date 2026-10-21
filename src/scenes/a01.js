@@ -66,6 +66,8 @@ export function createShot(canvas, config) {
       0.98,
       -2.25 + settings.nightstandZ,
     );
+    // The duvet drapes over Adam's current pose (after the bed has moved).
+    apartment.duvet.update(character);
     pipeline.render(time);
     return pose;
   };

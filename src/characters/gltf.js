@@ -214,6 +214,10 @@ export async function loadRiggedCharacter(
             mesh.morphTargetInfluences[index] = pose.face[key];
         }
     },
+    /** World position of a normalised joint (used by the duvet drape). */
+    jointPosition(name, target) {
+      return (bones[name]?.bone ?? root).getWorldPosition(target);
+    },
     dispose() {
       mixer.stopAllAction();
       mixer.uncacheRoot(root);
