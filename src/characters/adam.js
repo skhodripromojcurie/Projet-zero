@@ -1,147 +1,235 @@
 import * as THREE from "three";
-import { box, sphere, group, material } from "../environments/objects.js";
+import { JOINTS } from "../animations/humanoid.js";
+import {
+  createAdamMaterials,
+  segmentGeometry,
+  mesh,
+  joint,
+} from "./adam-parts.js";
+import { createHead } from "./adam-head.js";
 
-// Provisional primitive rig. Every character adapter exposes root + applyPose.
+// Pelvis position in the room when Adam lies in the bed at its origin.
+export const ADAM_BASE = [0.5, 0.76, -1.42];
+
+const up = (object) => {
+  object.rotation.z = Math.PI;
+  return object;
+};
+const blob = (parent, name, mat, position, scale) => {
+  const object = mesh(
+    parent,
+    name,
+    new THREE.SphereGeometry(1, 24, 18),
+    mat,
+    position,
+  );
+  object.scale.set(...scale);
+  return object;
+};
+
+// Provisional procedural rig, v2. Every character adapter exposes root + applyPose.
 export function createAdam() {
+  const m = createAdamMaterials();
   const root = new THREE.Group();
-  root.name = "Adam Morel — rig provisoire";
-  root.position.set(-0.3, 0, -1.08);
-  const hoodie = material("#303a40");
-  const skin = material("#b58f79", 0.92);
-  const hair = material("#2b2523");
-  const denim = material("#202c38");
-  const sole = material("#292c2c");
-  const torso = group(root, "Buste", [0, 0.92, 0]);
-  sphere(torso, "Sweat anthracite", [0.27, 0.34, 0.17], [0, 0.16, 0], hoodie);
-  sphere(torso, "Capuche", [0.23, 0.13, 0.12], [0, 0.41, -0.09], hoodie);
-  box(torso, "Poche du sweat", [0.32, 0.11, 0.025], [0, 0.02, 0.16], hoodie);
+  root.name = "Adam Morel — rig provisoire v2";
+  const j = {};
+  j.hips = joint(root, "Bassin");
+  blob(j.hips, "Jean · bassin", m.denim, [0, -0.04, -0.01], [0.16, 0.1, 0.098]);
+  j.spine = joint(j.hips, "Colonne", [0, 0.1, 0]);
+  up(
+    mesh(
+      j.spine,
+      "Sweat · ventre",
+      segmentGeometry(0.158, 0.162, 0.26, 0.68),
+      m.hoodie,
+      [0, -0.1, 0],
+    ),
+  );
+  mesh(
+    j.spine,
+    "Poche ventrale",
+    new THREE.BoxGeometry(0.2, 0.09, 0.02),
+    m.hoodie,
+    [0, 0.03, 0.105],
+  ).rotation.x = -0.12;
+  j.chest = joint(j.spine, "Poitrine", [0, 0.2, 0]);
+  // Flat shoulder line: a domed top would show through the neck.
+  up(
+    mesh(
+      j.chest,
+      "Sweat · poitrine",
+      segmentGeometry(0.166, 0.125, 0.2, 0.66, 0.25),
+      m.hoodie,
+      [0, -0.02, 0],
+    ),
+  );
+  // Hood collar: an open ring, the gap facing forward where the cords hang.
+  const collar = new THREE.TorusGeometry(0.066, 0.022, 10, 28, Math.PI * 1.6);
+  collar.rotateZ(Math.PI / 2 - Math.PI * 1.8);
+  const hood = mesh(
+    j.chest,
+    "Col de capuche",
+    collar,
+    m.hoodie,
+    [0, 0.205, -0.004],
+  );
+  hood.rotation.x = Math.PI / 2 - 0.35;
+  hood.scale.set(1, 1.15, 1);
+  blob(
+    j.chest,
+    "Capuche · dos",
+    m.hoodie,
+    [0, 0.18, -0.095],
+    [0.1, 0.07, 0.045],
+  );
   for (const side of [-1, 1]) {
-    box(
-      torso,
+    const cord = mesh(
+      j.chest,
       "Cordon",
-      [0.012, 0.15, 0.015],
-      [side * 0.06, 0.28, 0.17],
-      material("#9b9c96"),
+      new THREE.CylinderGeometry(0.0035, 0.0035, 0.13, 6),
+      m.cord,
+      [side * 0.03, 0.15, 0.106],
     );
-    const arm = group(torso, side < 0 ? "Bras gauche" : "Bras droit", [
-      side * 0.27,
-      0.29,
+    cord.rotation.x = -0.18;
+    mesh(
+      cord,
+      "Embout",
+      new THREE.CylinderGeometry(0.0045, 0.0045, 0.018, 6),
+      m.cord,
+      [0, -0.07, 0],
+    );
+  }
+  j.neck = joint(j.chest, "Cou", [0, 0.215, 0.005]);
+  // The neck skips received shadows: a hard chin shadow read as a cut.
+  up(
+    mesh(
+      j.neck,
+      "Cou",
+      segmentGeometry(0.045, 0.043, 0.13, 0.95),
+      m.skin,
+      [0, -0.045, -0.004],
+    ),
+  ).receiveShadow = false;
+  const face = createHead(j.neck, m);
+  j.head = face.head;
+
+  for (const [side, sign] of [
+    ["L", 1],
+    ["R", -1],
+  ]) {
+    const name = sign > 0 ? "gauche" : "droit";
+    j[`clavicle${side}`] = joint(j.chest, `Clavicule ${name}`, [
+      sign * 0.02,
+      0.19,
+      -0.005,
+    ]);
+    blob(
+      j[`clavicle${side}`],
+      "Épaule",
+      m.hoodie,
+      [sign * 0.13, -0.015, 0],
+      [0.062, 0.056, 0.064],
+    );
+    j[`upperArm${side}`] = joint(j[`clavicle${side}`], `Bras ${name}`, [
+      sign * 0.15,
+      -0.01,
       0,
     ]);
-    arm.rotation.z = side * 0.08;
-    sphere(arm, "Manche", [0.095, 0.24, 0.1], [0, -0.16, 0.045], hoodie);
-    const forearm = sphere(
-      arm,
-      "Avant-bras",
-      [0.085, 0.2, 0.09],
-      [0, -0.39, 0.16],
-      hoodie,
+    mesh(
+      j[`upperArm${side}`],
+      "Manche",
+      segmentGeometry(0.058, 0.046, 0.29, 0.95),
+      m.hoodie,
     );
-    forearm.rotation.x = -0.55;
-    sphere(arm, "Main", [0.075, 0.06, 0.105], [0, -0.53, 0.27], skin);
-    sphere(
-      root,
-      "Cuisse",
-      [0.12, 0.115, 0.29],
-      [side * 0.145, 0.74, 0.22],
-      denim,
+    j[`forearm${side}`] = joint(
+      j[`upperArm${side}`],
+      `Avant-bras ${name}`,
+      [0, -0.29, 0],
     );
-    sphere(root, "Genou", [0.12, 0.13, 0.12], [side * 0.145, 0.7, 0.46], denim);
-    sphere(root, "Jambe", [0.095, 0.29, 0.1], [side * 0.145, 0.4, 0.49], denim);
-    sphere(
-      root,
-      "Chaussure",
-      [0.115, 0.09, 0.2],
-      [side * 0.145, 0.1, 0.57],
-      sole,
+    mesh(
+      j[`forearm${side}`],
+      "Manche",
+      segmentGeometry(0.046, 0.04, 0.235, 0.95),
+      m.hoodie,
     );
-    box(
-      root,
-      "Semelle",
-      [0.21, 0.035, 0.36],
-      [side * 0.145, 0.035, 0.57],
-      material("#777b78"),
+    const cuff = mesh(
+      j[`forearm${side}`],
+      "Bord-côte",
+      new THREE.TorusGeometry(0.033, 0.009, 8, 20),
+      m.hoodie,
+      [0, -0.235, 0],
     );
-  }
-  const head = group(torso, "Tête", [0, 0.53, 0]);
-  sphere(head, "Cou", [0.07, 0.11, 0.07], [0, -0.06, 0], skin);
-  sphere(head, "Visage", [0.145, 0.195, 0.13], [0, 0.13, 0.013], skin);
-  sphere(
-    head,
-    "Mâchoire et barbe",
-    [0.12, 0.08, 0.108],
-    [0, 0.035, 0.03],
-    material("#65554a"),
-  );
-  sphere(
-    head,
-    "Menton",
-    [0.072, 0.032, 0.024],
-    [0, 0.008, 0.115],
-    material("#987a66"),
-  );
-  sphere(head, "Cheveux", [0.15, 0.09, 0.135], [0, 0.275, -0.007], hair);
-  for (let i = 0; i < 6; i++)
-    sphere(
-      head,
-      "Mèche",
-      [0.045, 0.04, 0.055],
-      [-0.1 + i * 0.04, 0.285 + (i % 3) * 0.012, 0.067],
-      hair,
+    cuff.rotation.x = Math.PI / 2;
+    j[`hand${side}`] = joint(
+      j[`forearm${side}`],
+      `Main ${name}`,
+      [0, -0.255, 0],
     );
-  for (const side of [-1, 1]) {
-    sphere(
-      head,
-      "Oreille",
-      [0.029, 0.05, 0.035],
-      [side * 0.145, 0.13, 0],
-      skin,
+    blob(
+      j[`hand${side}`],
+      "Paume",
+      m.handSkin,
+      [0, -0.06, 0.004],
+      [0.04, 0.07, 0.019],
     );
-    sphere(
-      head,
-      "Œil",
-      [0.031, 0.017, 0.013],
-      [side * 0.058, 0.16, 0.129],
-      material("#c5c2b1"),
+    const fingers = blob(
+      j[`hand${side}`],
+      "Doigts",
+      m.handSkin,
+      [0, -0.125, 0.012],
+      [0.036, 0.045, 0.015],
     );
-    sphere(
-      head,
-      "Iris",
-      [0.011, 0.013, 0.006],
-      [side * 0.058, 0.16, 0.141],
-      material("#323d3a"),
+    fingers.rotation.x = 0.35;
+    const thumb = blob(
+      j[`hand${side}`],
+      "Pouce",
+      m.handSkin,
+      [sign * 0.035, -0.05, 0.018],
+      [0.011, 0.032, 0.012],
     );
-    const brow = box(
-      head,
-      "Sourcil",
-      [0.064, 0.012, 0.013],
-      [side * 0.06, 0.2, 0.128],
-      hair,
+    thumb.rotation.z = sign * 0.45;
+
+    j[`thigh${side}`] = joint(j.hips, `Cuisse ${name}`, [
+      sign * 0.093,
+      -0.06,
+      0,
+    ]);
+    mesh(
+      j[`thigh${side}`],
+      "Jean · cuisse",
+      segmentGeometry(0.083, 0.058, 0.44, 0.95),
+      m.denim,
     );
-    brow.rotation.z = side * -0.1;
-    sphere(
-      head,
-      "Cerne",
-      [0.032, 0.008, 0.007],
-      [side * 0.058, 0.133, 0.132],
-      material("#967d70"),
+    j[`shin${side}`] = joint(j[`thigh${side}`], `Jambe ${name}`, [0, -0.44, 0]);
+    mesh(
+      j[`shin${side}`],
+      "Jean · jambe",
+      segmentGeometry(0.057, 0.043, 0.41, 0.95),
+      m.denim,
+    );
+    j[`foot${side}`] = joint(j[`shin${side}`], `Pied ${name}`, [0, -0.42, 0]);
+    blob(
+      j[`foot${side}`],
+      "Chaussette",
+      m.sock,
+      [0, -0.035, 0.065],
+      [0.042, 0.038, 0.115],
     );
   }
-  sphere(head, "Nez", [0.023, 0.044, 0.036], [0, 0.122, 0.14], skin);
-  box(
-    head,
-    "Bouche",
-    [0.058, 0.008, 0.007],
-    [0, 0.065, 0.136],
-    material("#644d45"),
-  );
+  for (const name of JOINTS)
+    if (!j[name]) throw new Error(`Articulation manquante : ${name}`);
+
   return {
     root,
+    joints: j,
     applyPose(pose, config) {
-      root.position.set(-0.3 + config.adamX, 0, -1.08 + config.adamZ);
-      torso.rotation.x = pose.torsoX;
-      torso.position.y = 0.92 + pose.shoulderLift;
-      head.rotation.set(pose.headX, pose.headY, 0);
+      root.position.set(
+        ADAM_BASE[0] + config.adamX,
+        ADAM_BASE[1],
+        ADAM_BASE[2] + config.adamZ,
+      );
+      for (const name of JOINTS) j[name].rotation.set(...pose.joints[name]);
+      face.setFace(pose.face, pose.gaze);
     },
   };
 }

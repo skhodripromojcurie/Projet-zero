@@ -2,27 +2,27 @@ import * as THREE from "three";
 export const CAMERA_PRESETS = {
   cinematic: {
     label: "A01 · Plan principal",
-    position: [2.5, 1.9, 2.8],
-    target: [-1.05, 1.25, -1.05],
-    fov: 48,
+    position: [-1.1, 1.8, 1.6],
+    target: [0.02, 1.1, -1.72],
+    fov: 52,
   },
   portrait: {
     label: "A02 · Visage d’Adam",
-    position: [0.65, 1.72, 0.65],
-    target: [-0.3, 1.52, -1.03],
-    fov: 37,
+    position: [-0.4, 1.45, -0.36],
+    target: [0.56, 1.17, -1.74],
+    fov: 43,
   },
   window: {
     label: "A03 · La fenêtre",
-    position: [1.8, 1.9, 1.8],
-    target: [-2.35, 1.62, -0.15],
-    fov: 49,
+    position: [1.15, 1.7, -2.3],
+    target: [-1.0, 1.4, -0.21],
+    fov: 50,
   },
   door: {
     label: "A04 · La porte",
-    position: [-1.7, 1.65, -1.9],
-    target: [0.9, 1.3, 3],
-    fov: 46,
+    position: [-0.25, 1.65, -2.6],
+    target: [1.25, 1.0, 1.1],
+    fov: 54,
   },
 };
 export function createCamera() {

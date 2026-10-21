@@ -14,7 +14,10 @@ export const DEFAULT_CONFIG = Object.freeze({
   message: "Bienvenue, survivant.",
   quest: "Survivre à la première heure.",
   reward: 100,
+  quality: "standard",
 });
+
+export const QUALITY_LEVELS = ["basse", "standard", "haute"];
 
 export const CHARACTER_LIBRARY = [
   {
@@ -60,6 +63,7 @@ export function sanitizeConfig(raw = {}) {
     if (typeof raw[key] === "number" && Number.isFinite(raw[key]))
       result[key] = Math.min(max, Math.max(min, raw[key]));
   }
+  if (QUALITY_LEVELS.includes(raw.quality)) result.quality = raw.quality;
   for (const key of ["title", "message", "quest"]) {
     if (typeof raw[key] === "string") result[key] = raw[key].slice(0, 100);
   }

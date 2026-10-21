@@ -29,7 +29,7 @@ sont des aperçus fixes du prototype exécuté, pas un hébergement.
 ```sh
 npm run build       # résultat statique dans dist/
 npm run preview     # vérifier le build sur le port 4173
-npm test            # timeline et chemins d’assets, 10 tests
+npm test            # poses, timeline, chargeur GLB, réglages et chemins, 16 tests
 ```
 
 `dist/` doit être servi par HTTP, pas ouvert directement avec un double-clic sur index.html.
@@ -101,46 +101,69 @@ le terminal n’affiche que le domaine. Les tests navigateur ci-dessous contrôl
 
 ## Ce qui fonctionne
 
-- Appartement en composants indépendants : lit, chevet, réveil **06:42**, fenêtre donnant
-  sur une rue, porte et commode. La porte est fermée ; le couloir n’est pas encore modélisé.
-- Adam provisoire articulé, sweat anthracite, jean sombre, cheveux bruns et barbe simplifiée.
+- Appartement en composants indépendants : lit avec couette drapée et oreillers, chevet
+  (réveil **06:42**, téléphone, verre, livre), fenêtre avec rideaux plissés et radiateur,
+  rue à l’aube (immeuble d’en face, réverbère orange), porte, commode, chaise et vêtements,
+  sac à dos, cadres et parquet texturé. La porte est fermée ; le couloir n’est pas modélisé.
+- Adam provisoire **v2** : rig procédural articulé (bassin, colonne, poitrine, cou, tête,
+  clavicules, bras, avant-bras, mains, cuisses, jambes, pieds), tête aux proportions
+  adultes, yeux orientables, paupières, sourcils et mâchoire animés, barbe légère et
+  cheveux courts en textures générées, sweat anthracite à capuche et jean sombre.
+- Animation par couches, toujours fonction du temps : blocage du plan, décalages
+  (les yeux mènent, la tête puis le buste suivent), respiration calme puis courte,
+  clignements, micro-mouvements à graine fixe et expressions (fatigue, sursaut, inquiétude).
 - Quatre cadrages fixes : plan principal, visage, fenêtre et porte.
 - Lecture, pause, reprise, retour au début, recherche temporelle et arrêt à la fin.
   La touche Espace contrôle la lecture hors champs et boutons.
 - Les poses et l’interface dépendent uniquement du temps : retrouver la même seconde
   donne la même image, sans mouvement aléatoire ni changement de visage.
+- Rendu : aube froide (projecteur à ombres et lumière surfacique de fenêtre), lampe chaude,
+  réverbère orange, faisceau lumineux et poussière, reflets d’environnement générés,
+  brouillard, étalonnage froid/chaud, vignette et grain liés au temps du plan.
+- Qualité du rendu réglable : **Basse** (rendu direct, ordinateur modeste ou téléphone),
+  **Standard** (halo lumineux et étalonnage) et **Haute** (ajoute l’occlusion ambiante).
 - Lumière froide, lampe chaude et exposition ajustables.
 - Position d’Adam relative au lit, déplacement du lit avec Adam et du chevet avec sa lampe.
 - Durée de 4 à 16 secondes et amplitude ajustables. Les quatre temps sont proportionnels.
-- Notification RPG HTML/CSS éditable (titre, message, quête, XP), apparition au dernier quart.
+  L’amplitude règle le jeu d’Adam ; le redressement est toujours joué.
+- Notification RPG HTML/CSS éditable (titre, message, quête, XP), compacte dans le tiers
+  bas du cadre pour laisser le visage visible. Une lumière bleue de l’interface éclaire Adam.
   La bibliothèque RPG présente aussi santé, endurance, caractéristiques, compétences et menace.
 - Bibliothèque par collections, inspecteur, vue plein écran et interface mobile.
 - Sauvegarde locale des réglages et rechargement automatique dans le même navigateur.
   Elle ne se synchronise pas entre appareils et ne remplace pas un fichier projet.
 - Bouton son : **cri synthétique provisoire**, désactivé par défaut. Il se déclenche en lecture,
   au début du deuxième temps. Pause, recherche et retour au début l’interrompent.
+- Chargeur GLB riggé prêt pour `adam_v1.glb` : profils de squelette, clips mélangés selon
+  le temps absolu, expressions faciales ARKit, regard. Il n’accepte qu’un modèle déclaré
+  avec sa licence dans `public/assets/models/manifest.json`. Voir
+  [docs/personnage-glb.md](docs/personnage-glb.md).
 
-| Temps d’origine | Action                                            |
-| --------------- | ------------------------------------------------- |
-| 0–2 s           | Adam redresse légèrement la tête                  |
-| 2–4 s           | Il réagit au cri lointain                         |
-| 4–6 s           | Il tourne progressivement la tête vers la fenêtre |
-| 6–8 s           | Il fixe la fenêtre, la notification apparaît      |
+| Temps d’origine | Action                                                                |
+| --------------- | --------------------------------------------------------------------- |
+| 0–2 s           | Adam dort, allongé ; il ouvre les yeux et se redresse dans son lit    |
+| 2–4 s           | Cri lointain : sursaut, souffle court, il écoute                      |
+| 4–6 s           | Ses yeux, puis sa tête et son buste se tournent vers la fenêtre       |
+| 6–8 s           | Il reste immobile et inquiet ; la notification du système apparaît    |
+
+Comparaisons avant/après du lot 1 : [docs/lot1](docs/lot1).
 
 ## Limites assumées
 
 C’est un **prototype fonctionnel et un animatique en primitives**, pas un personnage
-semi-réaliste fini. La géométrie et le visage restent visiblement simplifiés ; pas de
-vêtements simulés, de véritable rig facial, de lip-sync ou de mocap. L’éclairage n’a pas
-de ray tracing, de profondeur de champ ni d’étalonnage de production. Le cri est un repère
-sonore de synthèse, pas un enregistrement réaliste. Le fond de rue est sommaire.
+semi-réaliste fini. Adam v2 est un rig procédural amélioré : son visage reste stylisé et
+lisse, ses vêtements sont des volumes rigides, ses jambes restent sous la couette pendant
+le redressement. Pas de vêtements simulés, de peau translucide, de lip-sync ni de mocap.
+L’éclairage n’a pas de ray tracing ni de profondeur de champ. Le faisceau de lumière est
+un volume additif simulé. Le cri est un repère sonore de synthèse.
 
 Emma et Victor sont des entrées de préparation explicitement indisponibles. Les stats RPG
 sont des valeurs narratives initiales, sans système de combat ni simulation de progression.
 L’inspecteur fournit des réglages ciblés ; ce n’est pas encore un éditeur 3D généraliste.
 Pas d’export vidéo, montage multi-plan, import GLB par interface ni sous-titres pour l’instant.
-Le module GLB est une base d’adaptation, pas un remplacement automatique déjà validé avec un asset.
-Les performances dépendent du GPU ; la résolution est plafonnée à un ratio de pixels de 1,75.
+Le chargeur GLB est validé avec un mannequin technique généré par les tests, **pas avec un
+modèle humain** : les profils `mixamo` et `mpfb` restent à valider sur de vrais exports.
+Les performances dépendent du GPU ; choisir la qualité Basse sur un ordinateur modeste.
 
 ## Architecture
 
@@ -149,20 +172,30 @@ src/
   assets/paths.js             chemins publics adaptés à GitHub Pages
   animations/timeline.js      poses absolues et interpolation
   cameras/presets.js          cadrages fixes
-  characters/adam.js          rig procédural provisoire
-  characters/gltf.js          base d’adaptateur pour un futur GLB licencié
+  animations/a01.js           chorégraphie du plan A01 en couches
+  animations/curves.js        interpolations, bruit à graine fixe, clignements
+  animations/humanoid.js      vocabulaire de pose commun (articulations, visage ARKit)
+  characters/adam*.js         rig procédural provisoire v2 (corps, tête, matières)
+  characters/gltf.js          adaptateur GLB riggé (clips, pose, visage, regard)
+  characters/rig-profiles.js  correspondance des os : Projet Zéro, Mixamo, MPFB
+  characters/registry.js      manifeste des modèles et contrôle de licence
   environments/apartment.js  décor et éclairage
   environments/objects.js    composants et textures procédurales
+  environments/details.js    literie, mobilier, objets, rideaux
+  environments/exterior.js   rue, façade et ciel d’aube
+  environments/atmosphere.js faisceau de lumière et poussière
   scenes/a01.js              composition et rendu
+  scenes/rendering.js        post-traitement et niveaux de qualité
   scenes/config.js           réglages bornés et registre des personnages
   ui/                        studio, bibliothèque, audio, icônes
   main.js                    transport, édition, stockage local
 public/assets/               emplacement prévu pour les assets futurs
 ```
 
-Un personnage expose `root` et `applyPose(pose, config, time)`. Le remplacement d’Adam
-par un GLB conservera la scène et la timeline, mais demandera une correspondance de clips,
-une échelle, une orientation et un adaptateur de rig facial propres au modèle.
+Un personnage expose `root` et `applyPose(pose, config, time)`. Le rig procédural et
+l’adaptateur GLB reçoivent la même pose normalisée ; la scène ne connaît pas leur rig
+interne. Le remplacement d’Adam par un GLB demande une entrée de manifeste, un profil
+de squelette et, si besoin, la correspondance des clips et des expressions.
 Ne télécharger aucun asset avant vérification de sa licence commerciale. Voir
 [AGENTS.md](AGENTS.md) et [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
@@ -181,8 +214,9 @@ CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e
 
 Dans PowerShell avec un Chromium système : `$env:CHROMIUM_PATH = 'chemin-vers-chrome.exe'`.
 Playwright démarre Vite lui-même. Il vérifie WebGL, lecture/pause/fin, quatre caméras,
-réglages persistés, textes sans interprétation HTML, reproductibilité des images,
-plein écran, son et usage téléphone. Les captures du dernier test sont dans `artifacts/`.
+réglages persistés, qualité du rendu, textes sans interprétation HTML, reproductibilité
+des images, plein écran, son, usage téléphone, chargement d’un GLB riggé de test déclaré
+et refus d’un modèle sans licence. Les captures du dernier test sont dans `artifacts/`.
 Les captures de référence de `docs/` ne sont pas des comparaisons pixel à pixel entre GPU.
 La CI exécute compilation, tests unitaires et tests navigateur sous `/Projet-zero/`.
 Les tests de chemins comprennent le chargement HTTP d’un GLB minimal généré pendant
@@ -202,9 +236,9 @@ serveur de prévisualisation teste bien `dist/`.
 
 ## Prochaines priorités
 
-1. Choisir un modèle humain riggé à licence commerciale gratuite, améliorer son visage
-   et adapter les poses A01 sans changer la composition des scènes.
-2. Améliorer les matériaux et les ombres ; vérifier les performances sur le téléphone cible.
+1. Lot 2 : produire `adam_v1.glb` avec Blender et MPFB 2 (ressources CC0) par scripts,
+   le valider avec le contrat de [docs/personnage-glb.md](docs/personnage-glb.md).
+2. Vérifier les performances des trois qualités sur l’ordinateur et le téléphone cibles.
 3. Ajouter une sauvegarde/importation de fichiers projet, puis plusieurs plans et scènes.
 4. Préparer un export vidéo qui compose aussi l’interface HTML, l’audio et les sous-titres.
    Une capture du canvas seule ne contient pas la notification HTML.

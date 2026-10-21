@@ -1,35 +1,40 @@
 import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { createApartment } from "../environments/apartment.js";
 import { createAdam } from "../characters/adam.js";
 import { createCamera, setCamera } from "../cameras/presets.js";
 import { sampleShot } from "../animations/timeline.js";
+import { createRenderer, createPipeline } from "./rendering.js";
 
 export function createShot(canvas, config) {
-  const renderer = new THREE.WebGLRenderer({
-    canvas,
-    antialias: true,
-    alpha: false,
-    powerPreference: "high-performance",
-  });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFShadowMap;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  const renderer = createRenderer(canvas);
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#576c7b");
-  scene.fog = new THREE.FogExp2("#647989", 0.018);
+  scene.background = new THREE.Color("#0e151b");
+  scene.fog = new THREE.FogExp2("#16212a", 0.03);
+  // Generated studio environment for subtle reflections; no external HDR.
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.12;
+  pmrem.dispose();
   const camera = createCamera();
   setCamera(camera, "cinematic");
   const apartment = createApartment(scene);
-  const adam = createAdam();
-  scene.add(adam.root);
+  let character = createAdam();
+  scene.add(character.root);
+  // Blue spill from the system interface floating in front of Adam.
+  const hologramLight = new THREE.PointLight("#5fd2ff", 0, 1.6, 2);
+  hologramLight.name = "Lumière de l’interface";
+  scene.add(hologramLight);
+  const pipeline = createPipeline(renderer, scene, camera);
+  pipeline.setQuality(config.quality);
   let lastTime = 0,
     lastSettings = config;
   const draw = (time, settings) => {
     lastTime = time;
     lastSettings = settings;
+    pipeline.setQuality(settings.quality);
     const pose = sampleShot(time, settings.duration, settings.intensity);
-    adam.applyPose(
+    character.applyPose(
       pose,
       {
         ...settings,
@@ -38,9 +43,14 @@ export function createShot(canvas, config) {
       },
       time,
     );
+    const root = character.root.position;
+    hologramLight.position.set(root.x - 0.4, root.y + 0.62, root.z + 0.55);
+    hologramLight.intensity = 0.45 * pose.hologram;
     renderer.toneMappingExposure = settings.exposure;
-    apartment.cold.intensity = settings.coldLight;
-    apartment.lamp.intensity = settings.lampLight;
+    apartment.cold.intensity = settings.coldLight * 2.4;
+    apartment.windowGlow.intensity = settings.coldLight * 0.45;
+    apartment.shaft.update(time, settings.coldLight);
+    apartment.lamp.intensity = settings.lampLight * 0.5;
     apartment.objects.bed.position.set(
       0.65 + settings.bedX,
       0,
@@ -53,16 +63,16 @@ export function createShot(canvas, config) {
     );
     apartment.lamp.position.set(
       -0.92 + settings.nightstandX,
-      0.97,
+      0.98,
       -2.25 + settings.nightstandZ,
     );
-    renderer.render(scene, camera);
+    pipeline.render(time);
     return pose;
   };
   const resize = () => {
     const { width, height } = canvas.getBoundingClientRect();
     if (width && height) {
-      renderer.setSize(width, height, false);
+      pipeline.setSize(width, height);
       draw(lastTime, lastSettings);
     }
   };
@@ -75,8 +85,17 @@ export function createShot(canvas, config) {
     setCamera(key) {
       setCamera(camera, key);
     },
+    /** Swap the character adapter (procedural rig or loaded GLB). */
+    setCharacter(next) {
+      scene.remove(character.root);
+      character.dispose?.();
+      character = next;
+      scene.add(character.root);
+      draw(lastTime, lastSettings);
+    },
     dispose() {
       observer.disconnect();
+      pipeline.dispose();
       scene.traverse((obj) => {
         obj.geometry?.dispose();
         const materials = Array.isArray(obj.material)

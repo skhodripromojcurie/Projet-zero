@@ -36,7 +36,7 @@ export function mountLayout(app) {
           <div class="stage-grid"></div>
           <div class="stage-caption stage-caption-top">CAMÉRA 01 <span>FORMAT VERTICAL</span></div>
           <div id="frame" class="film-frame">
-            <canvas id="scene" aria-label="Scène 3D : Adam au bord de son lit dans son appartement"></canvas>
+            <canvas id="scene" aria-label="Scène 3D : Adam se réveille dans son lit, dans son appartement"></canvas>
             <div class="film-grade" aria-hidden="true"></div>
             <div class="frame-top"><span>ÉP. 01 — L’ÉVEIL</span><span>17.11.2027</span></div>
             <div class="rpg" id="rpg" aria-hidden="true">
@@ -61,15 +61,16 @@ export function mountLayout(app) {
           <details open><summary>PLAN & ANIMATION <span>01</span></summary><div class="field-body">
             <label class="field">Durée du plan <span class="input-unit"><input name="duration" type="number" min="4" max="16" step="0.5" value="8" /> s</span></label>
             <label class="range-field">Amplitude du mouvement <output id="intensity-value">100 %</output><input name="intensity" type="range" min="0" max="1.5" step="0.05" value="1" /></label>
-            <p class="field-note">Les quatre temps s’adaptent à la durée.</p>
+            <p class="field-note">Les quatre temps s’adaptent à la durée. L’amplitude règle le jeu d’Adam ; le redressement est toujours joué.</p>
           </div></details>
-          <details open><summary>ADAM · POSITION <span>02</span></summary><div class="field-body"><div class="axes"><label><b class="axis-x">X</b><input aria-label="Position X d’Adam" name="adamX" type="number" min="-0.45" max="0.45" step="0.05" value="0" /></label><label><b class="axis-z">Z</b><input aria-label="Position Z d’Adam" name="adamZ" type="number" min="-0.4" max="0.4" step="0.05" value="0" /></label><span>m</span></div><p class="field-note">Rig provisoire · assis au bord du lit</p></div></details>
+          <details open><summary>ADAM · POSITION <span>02</span></summary><div class="field-body"><div class="axes"><label><b class="axis-x">X</b><input aria-label="Position X d’Adam" name="adamX" type="number" min="-0.45" max="0.45" step="0.05" value="0" /></label><label><b class="axis-z">Z</b><input aria-label="Position Z d’Adam" name="adamZ" type="number" min="-0.4" max="0.4" step="0.05" value="0" /></label><span>m</span></div><p class="field-note">Rig provisoire v2 · dans le lit, relatif au lit</p></div></details>
           <details><summary>DÉCOR · POSITION <span>OBJ</span></summary><div class="field-body">
             <label class="text-field">Composant<select id="object-selector"><option value="bed">Lit (avec Adam)</option><option value="nightstand">Table de chevet</option></select></label>
             <div class="axes"><label><b class="axis-x">X</b><input id="object-x" aria-label="Décalage X de l’objet" type="number" min="-0.3" max="0.3" step="0.05" value="0" /></label><label><b class="axis-z">Z</b><input id="object-z" aria-label="Décalage Z de l’objet" type="number" min="-0.3" max="0.3" step="0.05" value="0" /></label><span>m</span></div>
             <p class="field-note">Décalage relatif à la position d’origine.</p>
           </div></details>
           <details open><summary>ÉCLAIRAGE <span>03</span></summary><div class="field-body">
+            <label class="text-field">Qualité du rendu<select name="quality"><option value="basse">Basse · ordinateur modeste</option><option value="standard">Standard · halo et étalonnage</option><option value="haute">Haute · occlusion ambiante</option></select></label>
             <label class="range-field">Exposition <output id="exposure-value">1.15</output><input name="exposure" type="range" min="0.5" max="2" step="0.05" value="1.15" /></label>
             <label class="range-field"><span><i class="light-dot cold"></i> Aube · lumière froide</span><output id="coldLight-value">3.0</output><input name="coldLight" type="range" min="0" max="8" step="0.1" value="3" /></label>
             <label class="range-field"><span><i class="light-dot warm"></i> Lampe · lumière chaude</span><output id="lampLight-value">5.0</output><input name="lampLight" type="range" min="0" max="12" step="0.1" value="5" /></label>

@@ -6,6 +6,8 @@ import { createAudio } from "./ui/audio.js";
 import { createShot } from "./scenes/a01.js";
 import { DEFAULT_CONFIG, sanitizeConfig } from "./scenes/config.js";
 import { advance } from "./animations/timeline.js";
+import { readCharacterEntry } from "./characters/registry.js";
+import { loadRiggedCharacter } from "./characters/gltf.js";
 
 mountLayout(document.querySelector("#app"));
 const $ = (selector) => document.querySelector(selector);
@@ -16,6 +18,7 @@ let time = 0,
   lastFrame = performance.now(),
   shot;
 let toastTimer;
+let characterStatus = "Rig procédural v2 actif · aucun modèle GLB déclaré.";
 const audio = createAudio();
 function notify(message) {
   $("#toast").textContent = message;
@@ -236,7 +239,7 @@ function switchLibrary(tab) {
     button.classList.toggle("active", selected);
     button.setAttribute("aria-pressed", String(selected));
   });
-  renderLibrary(tab, $("#library-content"), selectCamera);
+  renderLibrary(tab, $("#library-content"), selectCamera, characterStatus);
 }
 document
   .querySelectorAll("[data-tab]")
@@ -257,6 +260,27 @@ try {
   $("#status").textContent = "Rendu 3D indisponible";
   $("#play").disabled = true;
 }
+// Replace the procedural rig only with a declared, licensed GLB.
+async function loadDeclaredCharacter() {
+  try {
+    const entry = await readCharacterEntry("adam");
+    if (!entry) return;
+    characterStatus = "Chargement du modèle GLB…";
+    const model = await loadRiggedCharacter(entry.url, entry);
+    shot.setCharacter(model);
+    update();
+    const { mode, joints, morphs } = model.report;
+    characterStatus = `Modèle GLB chargé · ${entry.license} · ${mode === "clips" ? "clips" : "pose"} · ${joints.length} os · ${morphs.length} expressions.`;
+    $("#status").textContent = "Modèle GLB d’Adam chargé";
+  } catch (error) {
+    console.error(error);
+    characterStatus = `Modèle GLB non chargé · rig procédural conservé. ${error.message}`;
+    notify("Modèle GLB non chargé : le rig procédural est conservé.");
+  }
+  if (document.querySelector('[data-tab="characters"].active'))
+    switchLibrary("characters");
+}
+if (shot) loadDeclaredCharacter();
 function frame(now) {
   if (playing) {
     const previous = time;

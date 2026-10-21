@@ -1,7 +1,18 @@
 import * as THREE from "three";
+import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
 import { box, sphere, group, material, canvasTexture } from "./objects.js";
+import { createExterior } from "./exterior.js";
+import { createLightShaft } from "./atmosphere.js";
+import {
+  parquetTexture,
+  dressBed,
+  dressNightstand,
+  furnishRoom,
+  curtain,
+} from "./details.js";
 
 export function createApartment(scene) {
+  RectAreaLightUniformsLib.init();
   const room = group(scene, "Appartement d’Adam");
   const plasterTexture = canvasTexture(256, 256, (ctx, w, h) => {
     ctx.fillStyle = "#bbbcb7";
@@ -23,18 +34,15 @@ export function createApartment(scene) {
   const plaster = material("#c5c7c2", 0.95, { map: plasterTexture });
   const wood = material("#40352d");
   const trim = material("#868d8a");
-  const fabric = material("#888c88");
   const dark = material("#20282b");
 
-  box(room, "Sol", [6.4, 0.15, 6.4], [0, -0.09, 0], material("#554c41"));
-  for (let i = 0; i <= 20; i++)
-    box(
-      room,
-      `Joint de parquet ${i}`,
-      [0.012, 0.003, 6.4],
-      [-3.2 + i * 0.32, -0.011, 0],
-      material("#2f302b"),
-    );
+  box(
+    room,
+    "Sol",
+    [6.4, 0.15, 6.4],
+    [0, -0.09, 0],
+    material("#ffffff", 0.72, { map: parquetTexture() }),
+  );
   box(room, "Plafond", [6.4, 0.12, 6.4], [0, 3.26, 0], plaster);
   box(room, "Mur du lit", [6.4, 3.2, 0.18], [0, 1.6, -3.1], plaster);
   // Window opening is actual geometry, not a bright rectangle over a wall.
@@ -77,66 +85,15 @@ export function createApartment(scene) {
     [0.1, -0.88, 0],
     material("#a4a69b"),
   );
-  box(
-    windowGroup,
-    "Ciel matinal",
-    [0.02, 6, 12],
-    [-4, 0.4, 0],
-    new THREE.MeshBasicMaterial({ color: "#647f91" }),
-  );
-  const street = group(room, "Rue extérieure");
-  box(street, "Chaussée", [5, 0.15, 14], [-5.8, -0.4, 0], material("#26313a"));
-  for (let i = 0; i < 4; i++) {
-    const facade = group(street, `Immeuble ${i}`, [-7, 0, -5 + i * 3.5]);
-    box(
-      facade,
-      "Façade",
-      [0.3, 7, 3.2],
-      [0, 2, 0],
-      material(i % 2 ? "#646e73" : "#7a807c"),
-    );
-    for (let y = 0; y < 3; y++)
-      for (const z of [-0.85, 0.85]) {
-        box(
-          facade,
-          "Fenêtre voisine",
-          [0.32, 0.9, 0.58],
-          [0.04, 0.7 + y * 1.7, z],
-          material("#263841", 0.4),
-        );
-      }
-  }
-  const curtains = group(room, "Rideaux");
-  for (const side of [-1, 1])
-    for (let i = 0; i < 7; i++) {
-      box(
-        curtains,
-        "Pli de rideau",
-        [0.06 + (i % 2) * 0.04, 2.35, 0.085],
-        [-2.82 + (i % 2) * 0.035, 1.72, side * (1.11 + i * 0.065)],
-        material("#56636a"),
-      );
-    }
+  const exterior = createExterior(room);
+  const curtainMat = material("#4d5a61", 0.95, { side: THREE.DoubleSide });
+  curtain(room, "Rideau gauche", -1.08, -1.62, curtainMat);
+  curtain(room, "Rideau droit", 1.08, 1.55, curtainMat);
   const bed = group(room, "Lit", [0.65, 0, -1.4]);
   box(bed, "Sommier", [1.65, 0.28, 2.25], [0, 0.32, 0], wood);
   box(bed, "Matelas", [1.61, 0.22, 2.2], [0, 0.57, 0], material("#b2b2a2"));
   box(bed, "Tête de lit", [1.75, 1.1, 0.12], [0, 0.6, -1.15], wood);
-  const blanket = box(
-    bed,
-    "Couette",
-    [1.64, 0.14, 1.42],
-    [0, 0.74, 0.37],
-    material("#4e626a"),
-  );
-  for (let i = 0; i < 8; i++)
-    box(
-      blanket,
-      "Pli de couette",
-      [0.012, 0.012, 1.4],
-      [-0.7 + i * 0.2, 0.075, 0],
-      material("#586d74"),
-    );
-  sphere(bed, "Oreiller", [0.64, 0.12, 0.32], [0, 0.77, -0.74], fabric);
+  dressBed(bed);
   const nightstand = group(room, "Table de chevet", [-0.72, 0, -2.12]);
   box(nightstand, "Caisson", [0.65, 0.6, 0.56], [0, 0.3, 0], wood);
   box(
@@ -170,9 +127,14 @@ export function createApartment(scene) {
     [-0.2, 0.82, -0.13],
     material("#45463c"),
   );
+  dressNightstand(nightstand);
   const shade = new THREE.Mesh(
     new THREE.ConeGeometry(0.22, 0.27, 32, 1, true),
-    material("#d9b986", 0.9, { side: THREE.DoubleSide }),
+    material("#d9b986", 0.9, {
+      side: THREE.DoubleSide,
+      emissive: "#ffb169",
+      emissiveIntensity: 0.6,
+    }),
   );
   shade.position.set(-0.2, 1.04, -0.13);
   nightstand.add(shade);
@@ -230,21 +192,50 @@ export function createApartment(scene) {
     [2.05, 0.94, -2.5],
     material("#9d8c74"),
   );
-  const cold = new THREE.SpotLight("#a6d9ff", 3, 14, Math.PI / 3, 0.85, 1);
-  cold.position.set(-2.8, 2.25, 0);
-  cold.target.position.set(0.5, 0.3, -0.9);
+  // Dawn key light through the window: hard shadows from a spot, soft
+  // wrap from a rect light the size of the opening.
+  furnishRoom(room);
+  const cold = new THREE.SpotLight("#7fb0e0", 3, 14, Math.PI / 3.2, 0.9, 1);
+  cold.position.set(-3.6, 2.6, 0.2);
+  cold.target.position.set(0.5, 0.4, -1.1);
   cold.castShadow = true;
   cold.shadow.mapSize.set(1024, 1024);
-  cold.shadow.bias = -0.001;
+  cold.shadow.bias = -0.0008;
+  cold.shadow.normalBias = 0.02;
+  cold.shadow.radius = 4;
   scene.add(cold, cold.target);
-  const fill = new THREE.DirectionalLight("#b2c8d5", 0.65);
+  const windowGlow = new THREE.RectAreaLight("#8fb4d6", 1.1, 2.2, 1.6);
+  windowGlow.position.set(-2.97, 1.72, 0);
+  windowGlow.lookAt(0, 1.4, 0);
+  scene.add(windowGlow);
+  const bulb = sphere(
+    nightstand,
+    "Ampoule",
+    [0.035, 0.035, 0.035],
+    [-0.2, 0.98, -0.13],
+    new THREE.MeshBasicMaterial({ color: "#ffd7a8" }),
+  );
+  bulb.castShadow = false;
+  const clockGlow = new THREE.PointLight("#ff9a55", 0.12, 0.8, 2);
+  clockGlow.position.set(0, 0.75, 0.3);
+  nightstand.add(clockGlow);
+  const fill = new THREE.DirectionalLight("#7d97ad", 0.12);
   fill.position.set(1, 2.5, 3);
   scene.add(fill);
-  scene.add(new THREE.HemisphereLight("#8caab9", "#34352e", 1.3));
+  scene.add(new THREE.HemisphereLight("#6f8799", "#2a2620", 0.28));
+  const shaft = createLightShaft(scene, {
+    from: [-3.0, 1.72, 0],
+    size: [2.1, 1.6],
+    direction: [3.3, -1.95, -1.1],
+    length: 4.2,
+  });
   return {
     room,
     lamp,
     cold,
+    windowGlow,
+    shaft,
+    sodium: exterior.sodium,
     objects: { bed, nightstand, door, window: windowGroup },
   };
 }
