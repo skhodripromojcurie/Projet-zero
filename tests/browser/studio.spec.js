@@ -221,7 +221,12 @@ test("le studio et ses assets sont servis sous le chemin GitHub Pages", async ({
   }
   const asset = await request.get(new URL("assets/README.md", baseURL).href);
   expect(asset.status()).toBe(200);
-  expect(await asset.text()).toContain("Assets futurs");
+  expect(await asset.text()).toContain("Adam_Morel.glb");
+  const model = await request.get(
+    new URL("assets/models/Adam_Morel.glb", baseURL).href,
+  );
+  expect(model.status()).toBe(200);
+  expect((await model.body()).subarray(0, 4).toString()).toBe("glTF");
   expect(failed).toEqual([]);
 });
 
@@ -316,6 +321,9 @@ test("un GLB local s’évalue en pied et en gros plan sans quitter l’appareil
     if (request.method() !== "GET") uploads.push(request.url());
   });
   await ready(page);
+  const status = page.locator("#character-model-status");
+  await expect(status).toContainText("Modèle GLB chargé");
+  const before = await status.textContent();
   const body = await readFile(
     new URL("../fixtures/mannequin-mpfb.glb", import.meta.url),
   );
@@ -341,10 +349,31 @@ test("un GLB local s’évalue en pied et en gros plan sans quitter l’appareil
     .toBe(false);
   await page.getByRole("button", { name: "Fermer l’évaluation" }).click();
   await expect(page.locator("#evaluator")).toBeHidden();
-  // Adam procédural reste dans le plan.
-  await expect(page.locator("#character-model-status")).toContainText(
-    "Rig procédural v2 actif",
-  );
+  // Le personnage du plan n'est pas remplacé par le fichier évalué.
+  await expect(status).toHaveText(before);
   expect(uploads).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test("Adam_Morel.glb déclaré remplace le rig procédural dans le plan A01", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await ready(page);
+  await expect(page.locator("#status")).toHaveText("Modèle GLB d’Adam chargé", {
+    timeout: 60000,
+  });
+  await expect(page.locator("#character-model-status")).toContainText(
+    "19 os · 10 expressions",
+  );
+  // Le plan reste une fonction du temps : même instant, même image.
+  await page.selectOption("#camera", "portrait");
+  await seek(page, 2.6);
+  const first = await page.locator("#scene").screenshot();
+  await page.screenshot({ path: "artifacts/adam-glb-a01.png" });
+  await seek(page, 5);
+  await seek(page, 2.6);
+  expect((await page.locator("#scene").screenshot()).equals(first)).toBe(true);
   expect(errors).toEqual([]);
 });

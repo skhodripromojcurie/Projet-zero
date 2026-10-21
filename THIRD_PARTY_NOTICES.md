@@ -49,3 +49,19 @@ leur installation, sans copie dans ce dépôt :
 L'équipe MakeHuman ne revendique aucun droit sur les sorties de MPFB (modèles,
 rendus, exports). Cheveux, sourcils, cils, barbe et leurs textures sont générés par
 `tools/mpfb/pilosite.py` (création du projet).
+
+### `public/assets/models/Adam_Morel.glb` (publié avec le studio)
+
+Modèle généré par `tools/mpfb/construire_adam.py` à partir de la recette
+`tools/mpfb/adam_recette.json`. Il contient uniquement :
+
+| Élément du fichier | Origine | Licence |
+| --- | --- | --- |
+| Maillage du corps, dents, langue (géométrie d'aide), formes d'expression | MPFB 2, ressources de `mpfb2` | CC0 1.0 |
+| Squelette « game engine » (53 os) | MPFB 2, ressources de `mpfb2` | CC0 1.0 |
+| Globes oculaires « high-poly » | `makehuman` (`data/eyes`) | CC0 1.0 |
+| Os `eye_l` / `eye_r`, textures de peau et d'yeux cuites, barbe, cuir chevelu et sourcils peints, cartes de cheveux, sourcils et cils | scripts du projet | création du projet |
+| Sweat à capuche, jean, capuche, poche, cordons | `tools/blender/habiller_adam.py` (lot 2) | création du projet |
+
+Aucun code MPFB (GPL-3.0) n'est inclus dans le fichier ni dans le studio. Aucun
+fichier Mixamo ni autre ressource tierce. Usage commercial autorisé.

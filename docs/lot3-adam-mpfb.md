@@ -67,12 +67,10 @@ qui suivent trop peu le haut du front.
   régénère les six visages avec votre MPFB et ouvre `comparaison.html` dans le
   navigateur (20 à 60 minutes).
 
-## Après votre choix
+## Variante retenue
 
-1. La variante retenue est figée dans la recette.
-2. Expressions, squelette « game engine » (53 os, vérifié), habillage du lot 2,
-   cuisson de la peau en textures, export GLB compressé, chargement dans le studio.
-3. Rendus de validation : expressions, animation du squelette, plan A01.
+**Variante A**, validée sans retouche le 21/10/2026. Suite et modèle final :
+[lot3-adam-final.md](lot3-adam-final.md).
 
 ## Limites actuelles
 

@@ -90,7 +90,17 @@ def materiau_poils(nom, img, rugosite=0.55, clip=False, fondu=None):
         produit = arbre.nodes.new("ShaderNodeMath")
         produit.operation = "MULTIPLY"
         arbre.links.new(tex.outputs["Alpha"], produit.inputs[0])
-        arbre.links.new(attribut.outputs["Color"], produit.inputs[1])
+        arbre.links.new(attribut.outputs["Alpha"], produit.inputs[1])
+        # Couleur × attribut (blanc) : sans effet visible, mais l'exportateur glTF
+        # reconnaît alors l'attribut et l'écrit en COLOR_0 (alpha compris) pour Three.js.
+        teinte = arbre.nodes.new("ShaderNodeMix")
+        teinte.data_type = "RGBA"
+        teinte.blend_type = "MULTIPLY"
+        entree = {s.identifier: s for s in teinte.inputs}
+        entree["Factor_Float"].default_value = 1.0
+        arbre.links.new(tex.outputs["Color"], entree["A_Color"])
+        arbre.links.new(attribut.outputs["Color"], entree["B_Color"])
+        arbre.links.new(next(s for s in teinte.outputs if s.identifier == "Result_Color"), bsdf.inputs["Base Color"])
         arbre.links.new(produit.outputs[0], bsdf.inputs["Alpha"])
     else:
         arbre.links.new(tex.outputs["Alpha"], bsdf.inputs["Alpha"])
@@ -227,13 +237,11 @@ def meche(peau, racine, direction, longueur, largeur, lever, alea, segments=4, t
 # ---------------------------------------------------------------- éléments
 
 
-def cheveux(humain, peau, reperes, reglages):
-    alea = random.Random(reglages["graine"])
+def zone_cheveux(reperes):
+    """Implantation des cheveux : vrai pour un point (monde) du cuir chevelu."""
     g, d = reperes["joint-l-eye"], reperes["joint-r-eye"]
     yeux = (g + d) / 2
-    sommet = reperes["joint-head-2"]
     axe_y = reperes["joint-head"].y
-    couronne = Vector((0, axe_y + 0.035, sommet.z - 0.01))
 
     def zone(p):
         azimut = math.degrees(math.atan2(abs(p.x), -(p.y - axe_y)))  # 0 = devant
@@ -251,11 +259,26 @@ def cheveux(humain, peau, reperes, reglages):
             return False
         return p.z > seuil + 0.004 * math.sin(p.x * 400 + p.y * 300)
 
+    return zone
+
+
+def cheveux(humain, peau, reperes, reglages):
+    alea = random.Random(reglages["graine"])
+    g, d = reperes["joint-l-eye"], reperes["joint-r-eye"]
+    yeux = (g + d) / 2
+    sommet = reperes["joint-head-2"]
+    axe_y = reperes["joint-head"].y
+    couronne = Vector((0, axe_y + 0.035, sommet.z - 0.01))
+    zone = zone_cheveux(reperes)
+
     longueur_dessus = reglages["longueur_dessus_mm"] / 1000
     longueur_cotes = reglages["longueur_cotes_mm"] / 1000
     desordre = reglages["desordre"]
     cartes = []
-    for couche, (nombre, lever) in enumerate(((2200, 0.0018), (1500, 0.0035), (900, 0.0055))):
+    # Trois couches de mèches, de la racine vers le volume ; moins de cartes = fichier plus léger.
+    nombres = reglages.get("cartes", [2200, 1500, 900])
+    largeur_min, largeur_max = (w / 1000 for w in reglages.get("largeur_mm", [9, 14]))
+    for nombre, lever in zip(nombres, (0.0018, 0.0035, 0.0055)):
         for racine in peau.echantillons(zone, nombre, alea):
             vers_exterieur = racine - couronne
             haut = racine.z > yeux.z + 0.075
@@ -272,12 +295,12 @@ def cheveux(humain, peau, reperes, reglages):
                 direction = vers_exterieur.normalized() + Vector((0, 0.15, -0.9))
             direction.rotate(_rotation(alea.uniform(-0.6, 0.6) * desordre))
             longueur = (longueur_dessus if haut else longueur_cotes) * alea.uniform(0.7, 1.15)
-            largeur = alea.uniform(0.009, 0.014)
+            largeur = alea.uniform(largeur_min, largeur_max)
             cartes.append(meche(peau, racine, direction, longueur, largeur, lever * (1.4 if haut else 0.6), alea))
     img = texture_meches("Mèches", reglages["couleur"], reglages["graine"], fond=0.35)
     objet = objet_cartes("Cheveux", cartes, materiau_poils("Cheveux", img))
     sous_couche = couche_peau(
-        peau, zone, "Cuir chevelu", reglages["couleur"], 1.0, reglages["graine"] + 1, decalage=0.0012,
+        peau, zone, "Cheveux sous-couche", reglages["couleur"], 1.0, reglages["graine"] + 1, decalage=0.0012,
         image_tex=texture_cuir_chevelu("Cuir chevelu", reglages["couleur"], reglages["graine"] + 1),
     )
     return [objet, sous_couche]
@@ -333,7 +356,7 @@ def couche_peau(peau, zone, nom, couleur, opacite, graine, decalage=0.0008, imag
     fondu = maillage.color_attributes.new("fondu", "FLOAT_COLOR", "POINT")
     for i in range(len(sommets)):
         a = min(1.0, distance.get(i, 9) / 3.0)
-        fondu.data[i].color = (a, a, a, 1.0)
+        fondu.data[i].color = (1.0, 1.0, 1.0, a)
     objet = bpy.data.objects.new(nom, maillage)
     bpy.context.scene.collection.objects.link(objet)
     img = image_tex or texture_barbe(nom, couleur, opacite, graine)
@@ -341,7 +364,8 @@ def couche_peau(peau, zone, nom, couleur, opacite, graine, decalage=0.0008, imag
     return objet
 
 
-def barbe(humain, peau, reperes, reglages, graine):
+def zone_barbe(reperes):
+    """Zone de la barbe de quelques jours (joues, menton, lèvre supérieure, cou)."""
     g, d = reperes["joint-l-eye"], reperes["joint-r-eye"]
     yeux = (g + d) / 2
     ecart = (g - d).length
@@ -366,6 +390,11 @@ def barbe(humain, peau, reperes, reglages, graine):
             return False
         return True
 
+    return zone
+
+
+def barbe(humain, peau, reperes, reglages, graine):
+    zone = zone_barbe(reperes)
     img = texture_barbe("Barbe", reglages["couleur"], reglages["densite"], graine)
     return couche_peau(peau, zone, "Barbe", reglages["couleur"], reglages["densite"], graine, decalage=0.0005, image_tex=img)
 

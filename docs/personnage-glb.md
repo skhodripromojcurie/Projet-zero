@@ -44,7 +44,7 @@ ces articulations aux noms d’os du modèle :
 | ------------- | ------------------------------- | ----------------------------------------- |
 | `projet-zero` | export Blender du lot 2         | cible ; testé avec le mannequin technique |
 | `mixamo`      | auto-rig Mixamo (`mixamorig:*`) | correction de T-pose prévue, à valider    |
-| `mpfb`        | MPFB 2, squelette « game engine » | noms à confirmer sur l’export réel      |
+| `mpfb`        | MPFB 2, squelette « game engine » | validé avec `Adam_Morel.glb` (lot 3)    |
 
 Les axes propres à chaque os sont gérés par le chargeur : une rotation exprimée dans le
 repère du personnage est transposée dans le repère de repos de l’os.
@@ -65,7 +65,16 @@ même image. Aucune transition n’intègre le temps écoulé entre deux images.
 Expressions en morph targets, noms ARKit (alias possibles via `morphAliases`) :
 `eyeBlinkLeft`, `eyeBlinkRight`, `eyeWideLeft`, `eyeWideRight`, `browInnerUp`,
 `browDownLeft`, `browDownRight`, `jawOpen`, `mouthFrownLeft`, `mouthFrownRight`.
-Regard : os `eyeL`/`eyeR` (profil `projet-zero`). Un canal absent est ignoré.
+Regard : os `eyeL`/`eyeR` (profil `projet-zero`), `eye_l`/`eye_r` (profil `mpfb`,
+ajoutés par `tools/mpfb/finaliser.py`). Un canal absent est ignoré.
+
+## Cheveux en cartes
+
+`"alphaHash": ["Cheveux", "Sourcils", "Cils"]` dans le manifeste (ou `true` pour toutes
+les textures transparentes) dessine ces matériaux en transparence tramée : des milliers
+de mèches superposées sans tri ni scintillement d'une image à l'autre. L'évaluateur
+local l'applique d'office. Les maillages riggés ne sont jamais écartés par le cadrage
+(`frustumCulled = false`) : leurs bornes sont calculées dans la pose de liaison.
 
 ## Budget conseillé pour le navigateur
 
