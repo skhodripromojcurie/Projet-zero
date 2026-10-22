@@ -2,9 +2,12 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { createApartment } from "../environments/apartment.js";
 import { createAdam } from "../characters/adam.js";
-import { createCamera, setCamera } from "../cameras/presets.js";
+import { CAMERA_PRESETS, createCamera, setCamera } from "../cameras/presets.js";
 import { sampleShot } from "../animations/timeline.js";
 import { createRenderer, createPipeline } from "./rendering.js";
+
+// Fill light placement: towards the window (-x) and slightly above the eyes.
+const FILL_OFFSET = new THREE.Vector3(-0.15, 0.18, 0);
 
 export function createShot(canvas, config) {
   const renderer = createRenderer(canvas);
@@ -17,7 +20,9 @@ export function createShot(canvas, config) {
   scene.environmentIntensity = 0.12;
   pmrem.dispose();
   const camera = createCamera();
-  setCamera(camera, "cinematic");
+  let cameraKey = "cinematic";
+  const head = new THREE.Vector3();
+  setCamera(camera, cameraKey);
   const apartment = createApartment(scene);
   let character = createAdam();
   scene.add(character.root);
@@ -25,6 +30,10 @@ export function createShot(canvas, config) {
   const hologramLight = new THREE.PointLight("#5fd2ff", 0, 1.6, 2);
   hologramLight.name = "Lumière de l’interface";
   scene.add(hologramLight);
+  // Close shots only: a soft fill near the camera, on the window side.
+  const faceLight = new THREE.PointLight("#9fc3e6", 0, 1.4, 2);
+  faceLight.name = "Lumière de visage";
+  scene.add(faceLight);
   const pipeline = createPipeline(renderer, scene, camera);
   pipeline.setQuality(config.quality);
   let lastTime = 0,
@@ -68,6 +77,15 @@ export function createShot(canvas, config) {
     );
     // The duvet drapes over Adam's current pose (after the bed has moved).
     apartment.duvet.update(character);
+    // Close shots follow the head: a function of the pose, hence of time.
+    if (character.jointPosition)
+      setCamera(camera, cameraKey, character.jointPosition("head", head));
+    const fill = CAMERA_PRESETS[cameraKey]?.faceFill ?? 0;
+    faceLight.intensity = fill * settings.coldLight;
+    if (fill && character.jointPosition)
+      faceLight.position
+        .lerpVectors(head, camera.position, 0.55)
+        .add(FILL_OFFSET);
     pipeline.render(time);
     return pose;
   };
@@ -85,7 +103,9 @@ export function createShot(canvas, config) {
     camera,
     render: draw,
     setCamera(key) {
+      cameraKey = key;
       setCamera(camera, key);
+      draw(lastTime, lastSettings);
     },
     /** Swap the character adapter (procedural rig or loaded GLB). */
     setCharacter(next) {
