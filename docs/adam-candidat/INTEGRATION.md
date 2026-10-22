@@ -105,3 +105,32 @@ remplacement définitif et ne publie rien sur GitHub Pages.
 ![A02 à 5 secondes](A02-5.png)
 ![A01 à 7,6 secondes](A01-7.6.png)
 ![A03 à 5 secondes](A03-5.png)
+
+## Correction des yeux (modèle par défaut)
+
+Cause du regard « de zombie » dans Three.js : les deux **cornées** du maillage des
+yeux sont cartographiées sur le disque bleuté presque transparent (alpha ≈ 0,03) de
+`brown_eye.png`. Rendues opaques par `opaqueMaterials`, elles voilaient l'iris d'un
+blanc bleuté. L'iris d'origine était en outre rouge sombre.
+
+`tools/glb/corriger_yeux.py` (Python, numpy, Pillow) part du GLB d'origine
+(SHA-256 `3383b8cd…7e11`) et ne modifie que les yeux :
+- les triangles des cornées sont retirés (259) ; les globes et leurs UV sont conservés ;
+- `brown_eye.png` est recoloré : iris brun naturel (fibres d'origine conservées),
+  pupille sombre et nette, anneau limbique, blanc de l'œil moins lumineux et un peu chaud ;
+- le matériau des yeux devient opaque, rugosité 0,25.
+Visage, cheveux, vêtements, squelette et proportions sont recopiés à l'octet près.
+
+Le candidat corrigé devient le modèle `adam` par défaut. L'ancien modèle reste
+déclaré (`adam-ancien`) : `/Projet-zero/?adam=ancien` le recharge (retour arrière).
+Clignements, expressions et mouvements du regard restent indisponibles sur ce
+modèle ; le statut du studio l'indique.
+
+![Gros plans des yeux](yeux/gros-plans-yeux.jpg)
+![A01–A04 couché](yeux/vues-A01-A04-couche.jpg)
+![A01–A04 assis](yeux/vues-A01-A04-assis.jpg)
+![Texture](yeux/texture-yeux.jpg)
+
+Limites : maillage des yeux peu dense, d'où une petite traînée sombre sous la pupille
+gauche déjà présente dans les UV d'origine ; dans la lumière froide de l'aube, le
+blanc de l'œil paraît gris bleuté.
