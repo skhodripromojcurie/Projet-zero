@@ -4,6 +4,13 @@ import { buildHumanoidGlb } from "../fixtures/humanoid-glb.js";
 async function ready(page) {
   await page.goto("./");
   await expect(page.locator("body")).toHaveAttribute("data-ready", "true");
+  // The declared GLB (about 11 MB) loads after the scene: wait for it, or the
+  // image may change between two screenshots of the same instant.
+  await expect(page.locator("body")).toHaveAttribute(
+    "data-character",
+    /^(glb|procedural|repli)$/,
+    { timeout: 90000 },
+  );
 }
 async function seek(page, time) {
   await page.locator("#timeline").evaluate((input, value) => {

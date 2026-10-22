@@ -272,13 +272,19 @@ try {
   $("#play").disabled = true;
 }
 // Replace the procedural rig only with a declared, licensed GLB.
+// body[data-character]: "chargement", then "glb", "procedural" or "repli".
+// The image only depends on time once loading is over (tests wait for it).
 async function loadDeclaredCharacter() {
+  document.body.dataset.character = "chargement";
   try {
     // Default: the retained candidate. `?adam=ancien` restores the former model.
     const previous =
       new URLSearchParams(location.search).get("adam") === "ancien";
     const entry = await readCharacterEntry(previous ? "adam-ancien" : "adam");
-    if (!entry) return;
+    if (!entry) {
+      document.body.dataset.character = "procedural";
+      return;
+    }
     characterStatus = "Chargement du modèle GLB…";
     const model = await loadRiggedCharacter(entry.url, entry);
     shot.setCharacter(model);
@@ -290,10 +296,12 @@ async function loadDeclaredCharacter() {
         " Clignements, expressions et regard animés indisponibles sur ce modèle.";
     if (previous) characterStatus += " Ancien modèle (retour arrière).";
     $("#status").textContent = "Modèle GLB d’Adam chargé";
+    document.body.dataset.character = "glb";
   } catch (error) {
     console.error(error);
     characterStatus = `Modèle GLB non chargé · rig procédural conservé. ${error.message}`;
     notify("Modèle GLB non chargé : le rig procédural est conservé.");
+    document.body.dataset.character = "repli";
   }
   if (document.querySelector('[data-tab="characters"].active'))
     switchLibrary("characters");
