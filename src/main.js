@@ -272,24 +272,36 @@ try {
   $("#play").disabled = true;
 }
 // Replace the procedural rig only with a declared, licensed GLB.
+// body[data-character]: "chargement", then "glb", "procedural" or "repli".
+// The image only depends on time once loading is over (tests wait for it).
 async function loadDeclaredCharacter() {
+  document.body.dataset.character = "chargement";
   try {
-    const candidate = new URLSearchParams(location.search).get("adam") === "candidat";
-    const entry = await readCharacterEntry(candidate ? "adam-candidat" : "adam");
-    if (!entry) return;
+    // Default: the retained candidate. `?adam=ancien` restores the former model.
+    const previous =
+      new URLSearchParams(location.search).get("adam") === "ancien";
+    const entry = await readCharacterEntry(previous ? "adam-ancien" : "adam");
+    if (!entry) {
+      document.body.dataset.character = "procedural";
+      return;
+    }
     characterStatus = "Chargement du modèle GLB…";
     const model = await loadRiggedCharacter(entry.url, entry);
     shot.setCharacter(model);
     update();
     const { mode, joints, morphs } = model.report;
     characterStatus = `Modèle GLB chargé · ${entry.license} · ${mode === "clips" ? "clips" : "pose"} · ${joints.length} os · ${morphs.length} expressions.`;
-    if (candidate)
-      characterStatus += " Candidat en essai · expressions et regard animés indisponibles.";
+    if (!morphs.length)
+      characterStatus +=
+        " Clignements, expressions et regard animés indisponibles sur ce modèle.";
+    if (previous) characterStatus += " Ancien modèle (retour arrière).";
     $("#status").textContent = "Modèle GLB d’Adam chargé";
+    document.body.dataset.character = "glb";
   } catch (error) {
     console.error(error);
     characterStatus = `Modèle GLB non chargé · rig procédural conservé. ${error.message}`;
     notify("Modèle GLB non chargé : le rig procédural est conservé.");
+    document.body.dataset.character = "repli";
   }
   if (document.querySelector('[data-tab="characters"].active'))
     switchLibrary("characters");

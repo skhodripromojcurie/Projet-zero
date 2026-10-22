@@ -4,6 +4,13 @@ import { buildHumanoidGlb } from "../fixtures/humanoid-glb.js";
 async function ready(page) {
   await page.goto("./");
   await expect(page.locator("body")).toHaveAttribute("data-ready", "true");
+  // The declared GLB (about 11 MB) loads after the scene: wait for it, or the
+  // image may change between two screenshots of the same instant.
+  await expect(page.locator("body")).toHaveAttribute(
+    "data-character",
+    /^(glb|procedural|repli)$/,
+    { timeout: 90000 },
+  );
 }
 async function seek(page, time) {
   await page.locator("#timeline").evaluate((input, value) => {
@@ -355,17 +362,20 @@ test("un GLB local s’évalue en pied et en gros plan sans quitter l’appareil
   expect(errors).toEqual([]);
 });
 
-test("Adam_Morel.glb déclaré remplace le rig procédural dans le plan A01", async ({
+test("l’ancien Adam reste disponible en retour arrière (?adam=ancien)", async ({
   page,
 }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await ready(page);
+  await page.goto("./?adam=ancien");
   await expect(page.locator("#status")).toHaveText("Modèle GLB d’Adam chargé", {
     timeout: 60000,
   });
   await expect(page.locator("#character-model-status")).toContainText(
     "19 os · 10 expressions",
+  );
+  await expect(page.locator("#character-model-status")).toContainText(
+    "Ancien modèle",
   );
   // Le plan reste une fonction du temps : même instant, même image.
   await page.selectOption("#camera", "portrait");

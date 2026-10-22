@@ -2,24 +2,9 @@
   "version": 1,
   "characters": {
     "adam": {
-      "url": "assets/models/Adam_Morel.glb",
-      "profile": "mpfb",
-      "source": "Création Projet Zéro · MPFB 2.0.18 (ressources CC0) et scripts tools/mpfb",
-      "author": "Projet Zéro",
-      "license": "CC0 1.0 (base MakeHuman) · création originale",
-      "commercialUse": true,
-      "alphaHash": [
-        "Cheveux",
-        "Sourcils",
-        "Cils"
-      ],
-      "clips": {},
-      "morphAliases": {}
-    },
-    "adam-candidat": {
       "url": "assets/models/Adam_Morel_candidat.glb",
       "profile": "mpfb",
-      "source": "MakeHuman hm08 et assets MPFB locaux, en-têtes CC0 septembre 2020 ; modifications Blender pour Projet Zéro",
+      "source": "MakeHuman hm08 et assets MPFB locaux, en-têtes CC0 septembre 2020 ; modifications Blender pour Projet Zéro ; yeux corrigés par tools/glb/corriger_yeux.py",
       "author": "Base : Data Collection AB, Joel Palmius, Jonas Hauquier ; adaptation : Projet Zéro",
       "license": "CC0-1.0 — preuves locales jointes",
       "commercialUse": true,
@@ -33,10 +18,18 @@
         "Adam_Morel.high-poly",
         "Adam_Morel.teeth_base"
       ],
-      "alphaHash": [
-        "Human.short02",
-        "Adam_Morel.eyebrow001"
-      ]
+      "alphaHash": ["Human.short02", "Adam_Morel.eyebrow001"]
+    },
+    "adam-ancien": {
+      "url": "assets/models/Adam_Morel.glb",
+      "profile": "mpfb",
+      "source": "Création Projet Zéro · MPFB 2.0.18 (ressources CC0) et scripts tools/mpfb",
+      "author": "Projet Zéro",
+      "license": "CC0 1.0 (base MakeHuman) · création originale",
+      "commercialUse": true,
+      "alphaHash": ["Cheveux", "Sourcils", "Cils"],
+      "clips": {},
+      "morphAliases": {}
     }
   }
 }

@@ -1,11 +1,11 @@
 import { test, expect } from "@playwright/test";
 
-test("candidat : corps animé, quatre vues et retour au même instant", async ({ page }) => {
+test("candidat par défaut : corps animé, quatre vues et retour au même instant", async ({ page }) => {
   test.setTimeout(240000);
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
-  await page.goto("./?adam=candidat");
-  await expect(page.locator("#character-model-status")).toContainText("Candidat en essai", { timeout: 60000 });
+  await page.goto("./");
+  await expect(page.locator("#character-model-status")).toContainText("regard animés indisponibles", { timeout: 60000 });
   await expect(page.locator("#character-model-status")).toContainText("19 os · 0 expressions");
   const seek = async time => {
     await page.locator("#timeline").evaluate((input, value) => {
