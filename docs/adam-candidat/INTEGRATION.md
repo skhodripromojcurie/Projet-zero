@@ -99,6 +99,8 @@ remplacement définitif et ne publie rien sur GitHub Pages.
 - Les vues A01–A04 donnent un corps cadré, couché puis assis ; aucune garantie
   exhaustive de non-intersection des vêtements ne découle des tests d'image.
 - Rendu Chromium logiciel : aucune mesure de fluidité sur GPU réel revendiquée.
+- Version compilée (`STUDIO_PREVIEW=1`) : test candidat réussi, captures des
+  quatre vues et affichage téléphone 390×844 sans débordement horizontal.
 
 ![A02 à 5 secondes](A02-5.png)
 ![A01 à 7,6 secondes](A01-7.6.png)
