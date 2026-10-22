@@ -8,9 +8,35 @@
       "author": "Projet Zéro",
       "license": "CC0 1.0 (base MakeHuman) · création originale",
       "commercialUse": true,
-      "alphaHash": ["Cheveux", "Sourcils", "Cils"],
+      "alphaHash": [
+        "Cheveux",
+        "Sourcils",
+        "Cils"
+      ],
       "clips": {},
       "morphAliases": {}
+    },
+    "adam-candidat": {
+      "url": "assets/models/Adam_Morel_candidat.glb",
+      "profile": "mpfb",
+      "source": "MakeHuman hm08 et assets MPFB locaux, en-têtes CC0 septembre 2020 ; modifications Blender pour Projet Zéro",
+      "author": "Base : Data Collection AB, Joel Palmius, Jonas Hauquier ; adaptation : Projet Zéro",
+      "license": "CC0-1.0 — preuves locales jointes",
+      "commercialUse": true,
+      "clips": {},
+      "morphAliases": {},
+      "opaqueMaterials": [
+        "Adam_Morel.body",
+        "Adam_Morel.lips",
+        "Adam_Morel.fingernails",
+        "Adam_Morel.ears",
+        "Adam_Morel.high-poly",
+        "Adam_Morel.teeth_base"
+      ],
+      "alphaHash": [
+        "Human.short02",
+        "Adam_Morel.eyebrow001"
+      ]
     }
   }
 }

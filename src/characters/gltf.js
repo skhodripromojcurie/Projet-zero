@@ -62,6 +62,7 @@ export async function loadRiggedCharacter(
     clips = {},
     morphAliases = {},
     alphaHash = false,
+    opaqueMaterials = [],
   } = {},
 ) {
   const gltf = await new GLTFLoader().loadAsync(publicAssetUrl(url));
@@ -71,6 +72,15 @@ export async function loadRiggedCharacter(
   // culled although visible.
   root.traverse((object) => {
     if (object.isSkinnedMesh) object.frustumCulled = false;
+    // Some Blender exports mark skin and teeth as BLEND despite being opaque.
+    // Opt in per material: keep hair-card alpha and other characters intact.
+    for (const material of [object.material].flat()) {
+      if (material && opaqueMaterials.includes(material.name)) {
+        material.transparent = false;
+        material.opacity = 1;
+        material.depthWrite = true;
+      }
+    }
   });
   // Hair cards: dithered transparency, depth-tested like opaque surfaces, so
   // thousands of overlapping strands need no sorting (stable from frame to frame).

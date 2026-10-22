@@ -274,7 +274,8 @@ try {
 // Replace the procedural rig only with a declared, licensed GLB.
 async function loadDeclaredCharacter() {
   try {
-    const entry = await readCharacterEntry("adam");
+    const candidate = new URLSearchParams(location.search).get("adam") === "candidat";
+    const entry = await readCharacterEntry(candidate ? "adam-candidat" : "adam");
     if (!entry) return;
     characterStatus = "Chargement du modèle GLB…";
     const model = await loadRiggedCharacter(entry.url, entry);
@@ -282,6 +283,8 @@ async function loadDeclaredCharacter() {
     update();
     const { mode, joints, morphs } = model.report;
     characterStatus = `Modèle GLB chargé · ${entry.license} · ${mode === "clips" ? "clips" : "pose"} · ${joints.length} os · ${morphs.length} expressions.`;
+    if (candidate)
+      characterStatus += " Candidat en essai · expressions et regard animés indisponibles.";
     $("#status").textContent = "Modèle GLB d’Adam chargé";
   } catch (error) {
     console.error(error);
